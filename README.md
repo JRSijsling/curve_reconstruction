@@ -3,6 +3,11 @@ Description
 
 This repository contains Magma code for reconstructing hyperelliptic curves of genus up to 3 from their period matrices, both geometrically and arithematically. With some extra work, arbitrary genus should be feasible, though the author is not yet making moves in this direction.
 
+Prerequisites
+-------------
+
+You need `https://github.com/edgarcosta/endomorphisms` to install this repository.
+
 Installation
 ------------
 
