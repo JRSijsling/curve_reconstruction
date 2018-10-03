@@ -1,0 +1,10 @@
+{
+  fastthetasgenus2.m
+  fastthetaconstantsgenus3.m
+  precomp.m
+  reduce.m
+  riemann.m
+  rosenhain.m
+  theta_derivs.m
+  reconstruction.m
+}
