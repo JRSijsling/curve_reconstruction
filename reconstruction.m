@@ -122,6 +122,7 @@ Knew := K; Knew`base := K`base; Knew`base_gen := Knew ! K`base_gen; Knew`iota :=
 ICC := ChangeUniverse(ICC, Knew`CC);
 I := [ AlgebraizeElementLLL(inv, Knew) : inv in ICC ];
 g2 := IgusaToG2Invariants(I);
+
 Y := HyperellipticCurveFromG2Invariants(g2);
 if Type(Knew) eq FldRat then
     Y := ReducedMinimalWeierstrassModel(Y);
@@ -147,8 +148,8 @@ function ReconstructCurveGeometricG3(tau, K)
 assert IsSmallPeriodMatrix(tau);
 thetas := ThetaValues(tau);
 thetas_sq := [ theta^2 : theta in thetas ];
-vprint "CurveRec", 1: "Squares of theta values:";
-vprint "CurveRec", 1: ChangeUniverse(thetas_sq, ComplexField(5));
+vprint CurveRec, 2: "Squares of theta values:";
+vprint CurveRec, 2: ChangeUniverse(thetas_sq, ComplexField(5));
 v0s := FindDelta(thetas_sq);
 if #v0s eq 0 then
     error "Uncomment relevant section of reconstruction.m";

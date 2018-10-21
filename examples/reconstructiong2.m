@@ -37,10 +37,12 @@ P1 := Submatrix(P, 1,1, 2,2); P1i := P1^(-1);
 P2 := Submatrix(P, 1,3, 2,2);
 tau := P1i*P2;
 
+/*
 print "Geometric reconstruction over given base:";
 Y := ReconstructCurveGeometric(tau, F);
 print Y;
 print "";
+*/
 
 print "Arithmetic reconstruction over given base:";
 Y := ReconstructCurveBase(P, F);
