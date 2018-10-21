@@ -21,7 +21,7 @@ function RationalReconstruction(r);
         e:=-p;
     end if;
     if -e lt p/2 then
-        print "not a real";
+        //print "not a real";
         return false;
     end if;
     best:=0;
@@ -34,7 +34,7 @@ function RationalReconstruction(r);
         //print b;
     end while;
     if b ne best then
-        print "not enough precision";
+        //print "not enough precision";
         return false;
     else
         return b,i;
@@ -65,8 +65,9 @@ P := HorizontalJoin(IdentityMatrix(CC, 2), tau);
 
 /* Reduce small period matrix */
 taunew, gamma := ReduceSmallPeriodMatrix(tau);
-vprint CurveRec : "Eigenvalues of reduced tau:";
-vprint CurveRec : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(taunew) ];
+Imtaunew := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(taunew) ]);
+vprint CurveRec : "Eigenvalues of imaginary part of reduced tau:";
+vprint CurveRec : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
 
 /* Calculate corresponding big period matrix */
 A := Transpose(Submatrix(gamma, 1,1, 2,2));
@@ -78,8 +79,6 @@ P1new := Submatrix(Pnew, 1,1, 2,2); P1inew := P1new^(-1);
 P2new := Submatrix(Pnew, 1,3, 2,2);
 
 //print ChangeRing(taunew - P1new^(-1)*P2new, ComplexField(5));
-//print [ ComplexField(5) ! v[1] : v in Eigenvalues(tau) ];
-//print [ ComplexField(5) ! v[1] : v in Eigenvalues(taunew) ];
 
 /* Calculation of theta derivatives at odd two-torsion points */
 w1 := (1/2)*taunew*Transpose(Matrix(CC, [[0,1]])) + (1/2)*Transpose(Matrix(CC, [[0,1]]));
@@ -148,6 +147,8 @@ function ReconstructCurveGeometricG3(tau, K)
 assert IsSmallPeriodMatrix(tau);
 thetas := ThetaValues(tau);
 thetas_sq := [ theta^2 : theta in thetas ];
+vprint "CurveRec", 1: "Squares of theta values:";
+vprint "CurveRec", 1: ChangeUniverse(thetas_sq, ComplexField(5));
 v0s := FindDelta(thetas_sq);
 if #v0s eq 0 then
     error "Uncomment relevant section of reconstruction.m";
@@ -163,9 +164,12 @@ if #v0s eq 0 then
     */
 elif #v0s eq 1 then
     SCC := ShiodaInvariantsFromThetaSquares(thetas_sq);
-    Knew := K; Knew`base := K`base; Knew`base_gen := Knew ! K`base_gen; Knew`iota := K`iota;
+    //return SCC;
+    //Knew := K; Knew`base := K`base; Knew`base_gen := Knew ! K`base_gen; Knew`iota := K`iota;
     //Knew`CC := ComplexFieldExtra(Precision(Knew`CC) - 50);
-    SCC := ChangeUniverse(SCC, Knew`CC);
+    //SCC := ChangeUniverse(SCC, Knew`CC);
+    //L, S := NumberFieldExtra(SCC, K);
+    //return S;
     S := [ RationalReconstruction(inv) : inv in SCC ];
     return HyperellipticCurveFromShiodaInvariants(S);
 else
@@ -231,8 +235,9 @@ assert IsSmallPeriodMatrix(tau);
 
 /* Reduce small period matrix */
 taunew, gamma := ReduceSmallPeriodMatrix(tau);
-vprint CurveRec : "Eigenvalues of reduced tau:";
-vprint CurveRec : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(taunew) ];
+Imtaunew := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(taunew) ]);
+vprint CurveRec : "Eigenvalues of imaginary part of reduced tau:";
+vprint CurveRec : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
 
 /* Calculate corresponding big period matrix */
 A := Transpose(Submatrix(gamma, 1,1, 2,2));
@@ -244,8 +249,6 @@ P1new := Submatrix(Pnew, 1,1, 2,2); P1inew := P1new^(-1);
 P2new := Submatrix(Pnew, 1,3, 2,2);
 
 //print ChangeRing(taunew - P1new^(-1)*P2new, ComplexField(5));
-//print [ ComplexField(5) ! v[1] : v in Eigenvalues(tau) ];
-//print [ ComplexField(5) ! v[1] : v in Eigenvalues(taunew) ];
 
 /* Calculation of theta derivatives at odd two-torsion points */
 w1 := (1/2)*taunew*Transpose(Matrix(CC, [[0,1]])) + (1/2)*Transpose(Matrix(CC, [[0,1]]));
@@ -367,8 +370,9 @@ assert IsSmallPeriodMatrix(tau);
 
 /* Reduce small period matrix */
 taunew, gamma := ReduceSmallPeriodMatrix(tau);
-vprint CurveRec : "Eigenvalues of reduced tau:";
-vprint CurveRec : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(taunew) ];
+Imtaunew := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(taunew) ]);
+vprint CurveRec : "Eigenvalues of imaginary part of reduced tau:";
+vprint CurveRec : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
 
 /* Calculate corresponding big period matrix */
 A := Transpose(Submatrix(gamma, 1,1, 2,2));
@@ -380,8 +384,6 @@ P1new := Submatrix(Pnew, 1,1, 2,2); P1inew := P1new^(-1);
 P2new := Submatrix(Pnew, 1,3, 2,2);
 
 //print ChangeRing(taunew - P1new^(-1)*P2new, ComplexField(5));
-//print [ ComplexField(5) ! v[1] : v in Eigenvalues(tau) ];
-//print [ ComplexField(5) ! v[1] : v in Eigenvalues(taunew) ];
 
 /* Calculation of theta derivatives at odd two-torsion points */
 w1 := (1/2)*taunew*Transpose(Matrix(CC, [[0,1]])) + (1/2)*Transpose(Matrix(CC, [[0,1]]));
