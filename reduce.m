@@ -47,6 +47,16 @@ return test;
 end intrinsic;
 
 
+intrinsic SmallPeriodMatrix(P::ModMatFldElt) -> .
+{Returns small period matrix associated to P.}
+g := #Rows(P);
+P1 := Submatrix(P, 1,1,   g,g); P1i := P1^(-1);
+P2 := Submatrix(P, 1,g+1, g,g);
+tau := P1i*P2;
+return tau;
+end intrinsic;
+
+
 intrinsic IsBigPeriodMatrix(P::.) -> BoolElt
 {Returns whether P is (numerically) a big period matrix.}
 g := #Rows(P);
