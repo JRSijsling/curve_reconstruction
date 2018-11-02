@@ -112,8 +112,6 @@ end for;
 /* Recover polynomial over CC up to a constant */
 RCC := PolynomialRing(CC); R := PolynomialRing(K);
 fCC := &*[ RCC.1 - rat : rat in rats ];
-vprint CurveRec, 2 : "Reconstructed polynomial up to a constant:";
-vprint CurveRec, 2 : fCC;
 
 ICC := IgusaInvariants(fCC); W := [ 2, 4, 6, 8, 10 ];
 ICC := WPSNormalizeCC(W, ICC);
@@ -142,7 +140,8 @@ end function;
 
 
 function ReconstructCurveGeometricG3(tau, K)
-/* Alternative: implement Guardia */
+/* TODO: Does not work over extensions right now, the heights involved are too
+ *       large. Alternative: implement Guardia */
 
 /* Calculate thetas and see in which case we are */
 assert IsSmallPeriodMatrix(tau);
@@ -158,7 +157,6 @@ if #v0s eq 0 then
     Knew := K; Knew`base := K`base; Knew`base_gen := Knew ! K`base_gen; Knew`iota := K`iota;
     Knew`CC := ComplexFieldExtra(Precision(Knew`CC) - 50);
     ICC := ChangeUniverse(ICC, Knew`CC);
-    // TODO: Does not work over extensions right now, the heights involved are too large
     //K, I := NumberFieldExtra(ICC, F);
     I := [ RationalReconstruction(inv) : inv in ICC ];
     return TernaryQuarticFromDixmierOhnoInvariants(I);
@@ -283,8 +281,6 @@ end for;
 /* Recover polynomial over CC up to a constant */
 RCC := PolynomialRing(CC); R := PolynomialRing(K);
 fCC := &*[ RCC.1 - rat : rat in rats ];
-vprint CurveRec, 2 : "Reconstructed polynomial up to a constant:";
-vprint CurveRec, 2 : fCC;
 
 /* Identify correct twist */
 Y := SE_Curve(fCC, 2 : Prec := Precision(CC));
@@ -418,8 +414,6 @@ end for;
 /* Recover polynomial over CC up to a constant */
 RCC := PolynomialRing(CC);
 fCC := &*[ RCC.1 - rat : rat in rats ];
-vprint CurveRec, 2 : "Reconstructed polynomial up to a constant:";
-vprint CurveRec, 2 : fCC;
 
 /* Identify correct twist */
 Y := SE_Curve(fCC, 2 : Prec := Precision(CC));
