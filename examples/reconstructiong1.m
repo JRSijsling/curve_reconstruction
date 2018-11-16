@@ -21,24 +21,21 @@ P1 := Submatrix(P, 1,1, 1,1); P1i := P1^(-1);
 P2 := Submatrix(P, 1,2, 1,1);
 tau := P1i*P2;
 
-print "Geometric reconstruction over given base:";
+print "Geometric reconstruction:";
 X := ReconstructCurveGeometric(tau, F);
 print X;
 print "";
 
-print "Arithmetic reconstruction over given base:";
-X := ReconstructCurveBase(P, F);
+print "Geometric reconstruction over base:";
+X := ReconstructCurveGeometric(tau, F : Base := true);
 print X;
 print "";
 
-// BETA
-// Define curve
 f := x^3 + Sqrt(CC ! 2)*x + Sqrt(CC ! 3) + Sqrt(CC ! 5);
 X := SE_Curve(f, 2 : Prec := prec);
 P := ChangeRing(X`BigPeriodMatrix, CC);
 
-print "Arithmetic reconstruction allowing for base extension:";
-X := ReconstructCurveG1(P, F);
+print "Arithmetic reconstruction:";
+X := ReconstructCurve(P, F);
 print X;
 print "";
-

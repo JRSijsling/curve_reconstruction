@@ -22,6 +22,8 @@ D := [-5..5];
 repeat
     f := &+[ Random(D)*x^i : i in [0..6] ];
 until IsSquarefree(f) and (Degree(f) in [5,6]);
+f := -x^6 - 5*x^5 - 3*x^4 + 3*x^2 - 5*x - 2;
+
 print "Input polynomial:";
 print f;
 
@@ -37,20 +39,18 @@ P1 := Submatrix(P, 1,1, 2,2); P1i := P1^(-1);
 P2 := Submatrix(P, 1,3, 2,2);
 tau := P1i*P2;
 
-/*
-print "Geometric reconstruction over given base:";
+print "Geometric reconstruction:";
 Y := ReconstructCurveGeometric(tau, F);
 print Y;
 print "";
-*/
 
-print "Arithmetic reconstruction over given base:";
-Y := ReconstructCurveBase(P, F);
+print "Geometric reconstruction over base:";
+Y := ReconstructCurveGeometric(tau, F : Base := true);
+print Y;
+print "";
+
+print "Arithmetic reconstruction:";
+Y := ReconstructCurve(P, F);
 print "Recover correct curve?";
 print HyperellipticPolynomials(Y) eq f;
 print "";
-
-print "Arithmetic reconstruction over given base, alternative:";
-Y := ReconstructCurveG2(P, F);
-print "Recover correct curve?";
-print HyperellipticPolynomials(Y) eq f;

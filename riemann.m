@@ -44,8 +44,19 @@ return (x1*u1+x2*u2-x3*u3)^2-4*x1*u1*x2*u2;
 end function;
 
 
-function DixmierOhnoInvariantsFromThetaSquares(thetas)
+function DixmierOhnoInvariantsFromThetas(thetas)
 modsCC := ModuliFromTheta(thetas);
 ICC, W := DixmierOhnoInvariants(RiemannModelFromModuli(modsCC));
 return WPSNormalizeCC(W, ICC);
 end function;
+
+
+intrinsic DixmierOhnoInvariants(X::Crv) -> .
+{Returns the Dixmier--Ohno invariants of the curve X.}
+
+if not Type(X) eq CrvPln then
+    error "Input must be a plane curve";
+end if;
+return DixmierOhnoInvariants(DefiningPolynomial(X));
+
+end intrinsic;
