@@ -49,6 +49,11 @@ Y := ReconstructCurveGeometric(tau, F : Base := true);
 print Y;
 print "";
 
+print "Arithmetic reconstruction over base:";
+X := ReconstructCurve(P, F : Base := true);
+print X;
+print "";
+
 print "Arithmetic reconstruction:";
 Y := ReconstructCurve(P, F);
 print "Recover correct curve?";

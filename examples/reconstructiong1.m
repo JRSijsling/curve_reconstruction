@@ -31,6 +31,11 @@ X := ReconstructCurveGeometric(tau, F : Base := true);
 print X;
 print "";
 
+print "Arithmetic reconstruction over base:";
+X := ReconstructCurve(P, F : Base := true);
+print X;
+print "";
+
 f := x^3 + Sqrt(CC ! 2)*x + Sqrt(CC ! 3) + Sqrt(CC ! 5);
 X := SE_Curve(f, 2 : Prec := prec);
 P := ChangeRing(X`BigPeriodMatrix, CC);

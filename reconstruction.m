@@ -62,14 +62,14 @@ end if;
 end intrinsic;
 
 
-intrinsic ReconstructCurve(P::., K::Fld) -> Crv
+intrinsic ReconstructCurve(P::., K::Fld : Base := false) -> Crv
 {Reconstruct curve from big period matrix P. The end result will be over an extension of K.}
 
 g := #Rows(P);
 if g eq 1 then
-    return ReconstructCurveG1(P, K);
+    return ReconstructCurveG1(P, K : Base := Base);
 elif g eq 2 then
-    return ReconstructCurveG2(P, K);
+    return ReconstructCurveG2(P, K : Base := Base);
 else
     error "Genus too large!";
 end if;
@@ -92,7 +92,7 @@ if Base then
     end if;
     hKL := CanonicalInclusionMap(K, K);
 else
-    L, Lj, hKL := ExtendNumberFieldExtra(K, [ jCC ]); j := Lj[1];
+    L, Lj, hKL := NumberFieldExtra([ jCC ], K); j := Lj[1];
 end if;
 
 E := EllipticCurveFromjInvariant(j);
@@ -104,7 +104,7 @@ return E, hKL;
 end function;
 
 
-function ReconstructCurveG1(P, K)
+function ReconstructCurveG1(P, K : Base := false)
 // Reconstruct curve from period matrix P, returned over an extension of the
 // base field K.
 
@@ -122,8 +122,23 @@ end if;
 g4CC := 120 * (1/P[1,1])^4 * ZetaFunction(RR, 4) * Eisenstein(4, Eltseq(P));
 g6CC := 280 * (1/P[1,1])^6 * ZetaFunction(RR, 6) * Eisenstein(6, Eltseq(P));
 
-L, elts, hKL := ExtendNumberFieldExtra(K, [ g4CC, g6CC ]);
-g4 := elts[1]; g6 := elts[2];
+if Base then
+    if Type(K) eq FldRat then
+        g4 := RationalReconstruction(g4CC);
+        g6 := RationalReconstruction(g6CC);
+    else
+        testg4, g4 := AlgebraizeElement(g4CC, K);
+        testg6, g6 := AlgebraizeElement(g6CC, K);
+        if not (testg4 and testg6) then
+            error "Failed to algebraize in given field";
+        end if;
+    end if;
+    L := K; hKL := CanonicalInclusionMap(K, L);
+else
+    L, elts, hKL := NumberFieldExtra([ g4CC, g6CC ], K);
+    g4 := elts[1]; g6 := elts[2];
+end if;
+
 R<x> := PolynomialRing(L); f := (4*x^3 - g4*x - g6)/4; h := 0;
 X := HyperellipticCurve(f);
 
@@ -209,7 +224,7 @@ if Base then
     end if;
     hKL := CanonicalInclusionMap(K, K);
 else
-    L, I, hKL := ExtendNumberFieldExtra(K, ICC);
+    L, I, hKL := NumberFieldExtra(ICC, K);
 end if;
 
 g2 := IgusaToG2Invariants(I);
@@ -231,7 +246,7 @@ return Y, hKL;
 end function;
 
 
-function ReconstructCurveG2(P, K)
+function ReconstructCurveG2(P, K : Base := false)
 // Reconstruct curve from period matrix P, returned over an extension of the
 // base field K.
 
@@ -302,7 +317,26 @@ lam := Lambda[1,1];
 /* Recover twisted polynomial over number field */
 fCC := lam^2*fCC; coeffsCC := Coefficients(fCC);
 coeffsCC := ChangeUniverse(coeffsCC, K`CC);
-L, coeffs, hKL := ExtendNumberFieldExtra(K, coeffsCC); R := PolynomialRing(L);
+
+if Base then
+    if Type(K) eq FldRat then
+        coeffs := [ RationalReconstruction(coeffCC) : coeffCC in coeffsCC ];
+    else
+        coeffs := [ ];
+        for coeffCC in coeffsCC do
+            test, coeff := AlgebraizeElement(coeffCC, K);
+            if not test then
+                error "Failed to algebraize in given field";
+            end if;
+            Append(~coeffs, coeff);
+        end for;
+    end if;
+    L := K; hKL := CanonicalInclusionMap(K, L);
+else
+    L, coeffs, hKL := NumberFieldExtra(coeffsCC, K);
+end if;
+
+R := PolynomialRing(L);
 f := &+[ coeffs[i]*R.1^(i - 1) : i in [1..#coeffs] ];
 Y := HyperellipticCurve(f);
 
@@ -343,7 +377,7 @@ if #v0s eq 0 then
         end if;
         hKL := CanonicalInclusionMap(K, K);
     else
-        L, I, hKL := ExtendNumberFieldExtra(K, ICC);
+        L, I, hKL := NumberFieldExtra(ICC, K);
     end if;
     Y := TernaryQuarticFromDixmierOhnoInvariants(I);
     return PlaneCurve(Y), hKL;
@@ -366,7 +400,7 @@ elif #v0s eq 1 then
         end if;
         hKL := CanonicalInclusionMap(K, K);
     else
-        L, S, hKL := ExtendNumberFieldExtra(K, SCC);
+        L, S, hKL := NumberFieldExtra(SCC, K);
     end if;
     Y := HyperellipticCurveFromShiodaInvariants(S);
     return Y, hKL;
