@@ -117,7 +117,7 @@ assert IsSmallPeriodMatrix(tau);
 /* Classical elliptic functions */
 CC := Parent(P[1,1]); RR := RealField(CC);
 if Im(P[1,2]/P[1,1]) lt 0 then
-    P := [ P[1,2], P[1,1] ];
+    P := Matrix([ [ P[1,2], P[1,1] ] ]);
 end if;
 g4CC := 120 * (1/P[1,1])^4 * ZetaFunction(RR, 4) * Eisenstein(4, Eltseq(P));
 g6CC := 280 * (1/P[1,1])^6 * ZetaFunction(RR, 6) * Eisenstein(6, Eltseq(P));
@@ -130,8 +130,9 @@ X := HyperellipticCurve(f);
 R<x> := PolynomialRing(CC);
 fCC := (4*x^3 - g4CC*x - g6CC)/4; hCC := R ! 0;
 Q := ChangeRing(PeriodMatrix([ fCC, hCC ], [ f, h ]), CC);
-abs := Max([ Abs(c) : c in Eltseq(P - Q) ]);
-assert abs lt CC`epscomp;
+/* This functions as an assertion */
+A := Matrix(CC, [[1]]);
+R := HomologyRepresentation(A, P, Q);
 return X, hKL;
 
 end function;
