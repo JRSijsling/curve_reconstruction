@@ -126,6 +126,9 @@ if Base then
     if Type(K) eq FldRat then
         g4 := RationalReconstruction(g4CC);
         g6 := RationalReconstruction(g6CC);
+        if Type(g4) eq BoolElt or Type(g6) eq BoolElt then
+            error "Failed to algebraize as a rational number";
+        end if;
     else
         testg4, g4 := AlgebraizeElement(g4CC, K);
         testg6, g6 := AlgebraizeElement(g6CC, K);

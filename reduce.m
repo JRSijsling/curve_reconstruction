@@ -95,6 +95,14 @@ return tau - ChangeRing(tauZZ, BaseRing(tau));
 end function;
 
 
+function MinkowskiTestG2(tau)
+
+a := Im(tau[1,1]); b := Im(tau[1,2]); c := Im(tau[2,2]);
+return (c ge a) and (a ge 2*b) and (2*b ge 0);
+
+end function;
+
+
 function ReduceSmallPeriodMatrixG2Minkowski(tau)
 // Dupont; end result is U*tau_orig*Transpose(U)
 tau[2,1] := tau[1,2];
@@ -109,23 +117,37 @@ while t do
                 T := Matrix(CC, [[1,0],[0,-1]]);
                 tau := T*tau*Transpose(T);
                 U := T*U;
+                tau[2,1] := tau[1,2];
+                if MinkowskiTestG2(tau) then
+                    assert IsSmallPeriodMatrix(tau);
+                    return tau, U;
+                end if;
             end if;
             t := false;
         else
             T := Matrix(CC, [[0,1],[-1,0]]);
             tau := T*tau*Transpose(T);
             U := T*U;
+            tau[2,1] := tau[1,2];
+            if MinkowskiTestG2(tau) then
+                assert IsSmallPeriodMatrix(tau);
+                return tau, U;
+            end if;
         end if;
     end if;
     q := Round(Im(tau[1,2]) / Im(tau[1,1]));
     T := Matrix(CC, [[1,0],[-q,1]]);
     tau := T*tau*Transpose(T);
     U := T*U;
+    tau[2,1] := tau[1,2];
+    if MinkowskiTestG2(tau) then
+        assert IsSmallPeriodMatrix(tau);
+        return tau, U;
+    end if;
 end while;
 tau[2,1] := tau[1,2];
 assert IsSmallPeriodMatrix(tau);
-a := Im(tau[1,1]); b := Im(tau[1,2]); c := Im(tau[2,2]);
-assert c ge a; assert a ge 2*b; assert 2*b ge 0;
+assert MinkowskiTestG2(tau);
 return tau, U;
 
 end function;
@@ -280,8 +302,9 @@ Matrix(CC, [
 ];
 
 gamma := IdentityMatrix(CC, 4); taup := tau; t := true;
+counter := 0;
 while t do
-    //print taup;
+    counter +:= 1;
     taup, U := ReduceSmallPeriodMatrixG2Minkowski(taup);
     gamma := BlockMatrix([ [U, 0], [0, Transpose(U^(-1))] ]) * gamma;
     taupjs := [ taup[1,1], taup[2,2], taup[1,2] ];
@@ -303,6 +326,10 @@ while t do
             //break;
         end if;
     end for;
+    /* TODO: Find something that works better */
+    if counter eq 10^3 then
+        t := false;
+    end if;
 end while;
 
 taup[2,1] := taup[1,2];
