@@ -166,8 +166,10 @@ P := HorizontalJoin(IdentityMatrix(CC, 2), tau);
 /* Reduce small period matrix */
 taunew, gamma := ReduceSmallPeriodMatrix(tau);
 Imtaunew := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(taunew) ]);
-vprint CurveRec : "Eigenvalues of imaginary part of reduced tau:";
-vprint CurveRec : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
+
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2 : "Eigenvalues of imaginary part of reduced tau:";
+vprint CurveRec, 2 : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
 
 /* Calculate corresponding big period matrix */
 A := Transpose(Submatrix(gamma, 1,1, 2,2));
@@ -186,12 +188,14 @@ w4 := (1/2)*taunew*Transpose(Matrix(CC, [[1,0]])) + (1/2)*Transpose(Matrix(CC, [
 w5 := (1/2)*taunew*Transpose(Matrix(CC, [[1,1]])) + (1/2)*Transpose(Matrix(CC, [[0,1]]));
 w6 := (1/2)*taunew*Transpose(Matrix(CC, [[1,1]])) + (1/2)*Transpose(Matrix(CC, [[1,0]]));
 ws := [ w1, w2, w3, w4, w5, w6 ];
+
+vprint CurveRec, 2 : "";
 vprint CurveRec : "Calculate theta derivatives...";
 theta_derss := [ ThetaDerivatives(taunew, w) : w in ws ];
 vprint CurveRec : "done.";
-Hs := [ Matrix(CC, [ theta_ders ]) * P1inew : theta_ders in theta_derss ];
 
 /* Determination of ratios = roots */
+Hs := [ Matrix(CC, [ theta_ders ]) * P1inew : theta_ders in theta_derss ];
 rats := [ ];
 for H in Hs do
     seq := Eltseq(H);
@@ -262,8 +266,10 @@ assert IsSmallPeriodMatrix(tau);
 /* Reduce small period matrix */
 taunew, gamma := ReduceSmallPeriodMatrix(tau);
 Imtaunew := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(taunew) ]);
-vprint CurveRec : "Eigenvalues of imaginary part of reduced tau:";
-vprint CurveRec : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
+
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2 : "Eigenvalues of imaginary part of reduced tau:";
+vprint CurveRec, 2 : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
 
 /* Calculate corresponding big period matrix */
 A := Transpose(Submatrix(gamma, 1,1, 2,2));
@@ -282,12 +288,14 @@ w4 := (1/2)*taunew*Transpose(Matrix(CC, [[1,0]])) + (1/2)*Transpose(Matrix(CC, [
 w5 := (1/2)*taunew*Transpose(Matrix(CC, [[1,1]])) + (1/2)*Transpose(Matrix(CC, [[0,1]]));
 w6 := (1/2)*taunew*Transpose(Matrix(CC, [[1,1]])) + (1/2)*Transpose(Matrix(CC, [[1,0]]));
 ws := [ w1, w2, w3, w4, w5, w6 ];
+
+vprint CurveRec, 2 : "";
 vprint CurveRec : "Calculate theta derivatives...";
 theta_derss := [ ThetaDerivatives(taunew, w) : w in ws ];
 vprint CurveRec : "done.";
-Hs := [ Matrix(CC, [ theta_ders ]) * P1inew : theta_ders in theta_derss ];
 
 /* Determination of ratios = roots */
+Hs := [ Matrix(CC, [ theta_ders ]) * P1inew : theta_ders in theta_derss ];
 rats := [ ];
 for H in Hs do
     seq := Eltseq(H);
@@ -361,12 +369,14 @@ function ReconstructCurveGeometricG3(tau, K : Base := Base)
 assert IsSmallPeriodMatrix(tau);
 thetas := ThetaValues(tau);
 thetas_sq := [ theta^2 : theta in thetas ];
+
+vprint CurveRec, 2 : "";
 vprint CurveRec, 2: "Squares of theta values:";
 vprint CurveRec, 2: ChangeUniverse(thetas_sq, ComplexField(5));
-v0s := FindDelta(thetas_sq);
 
+v0s := FindDelta(thetas_sq);
 if #v0s eq 0 then
-    error "Uncomment relevant section of reconstruction.m";
+    error "Uncomment relevant section of curve_reconstruction/reconstruction.m";
     /*
     ICC := DixmierOhnoInvariantsFromThetas(thetas);
     if Base then

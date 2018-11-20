@@ -41,6 +41,7 @@ intrinsic IsSmallPeriodMatrix(tau::.) -> BoolElt
 Imtau := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(tau) ]);
 test := IsSymmetricImproved(tau) and IsPositiveDefiniteImproved(Imtau);
 if not test then
+    vprint CurveRec : "Not a small period matrix:";
     vprint CurveRec : tau;
 end if;
 return test;
