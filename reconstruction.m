@@ -311,6 +311,10 @@ Y := SE_Curve(fCC, 2 : Prec := Precision(CC));
 Q := ChangeRing(Y`BigPeriodMatrix, CC) / 2;
 homs := GeometricHomomorphismRepresentationCC(P, Q);
 As := [ hom[1] : hom in homs ];
+if #As eq 0 then
+    error "No geometric homomorphism found: increase precision or bound in calculating theta derivatives";
+end if;
+
 M := Matrix([ [ Re(A[1,1] - A[2,2]), Im(A[1,1] - A[2,2]), Re(A[1,2]), Im(A[1,2]), Re(A[2,1]), Im(A[2,1]) ] : A in As ]);
 Ker := IntegralLeftKernel(M);
 row := Eltseq(Rows(Ker)[1]);
