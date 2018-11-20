@@ -148,7 +148,7 @@ X := HyperellipticCurve(f);
 R<x> := PolynomialRing(CC);
 fCC := (4*x^3 - g4CC*x - g6CC)/4; hCC := R ! 0;
 Q := ChangeRing(PeriodMatrix([ fCC, hCC ], [ f, h ]), CC);
-/* This functions as an assertion */
+/* The next line functions as an assertion */
 A := Matrix(CC, [[1]]);
 R := HomologyRepresentation(A, P, Q);
 return X, hKL;
@@ -189,10 +189,10 @@ w5 := (1/2)*taunew*Transpose(Matrix(CC, [[1,1]])) + (1/2)*Transpose(Matrix(CC, [
 w6 := (1/2)*taunew*Transpose(Matrix(CC, [[1,1]])) + (1/2)*Transpose(Matrix(CC, [[1,0]]));
 ws := [ w1, w2, w3, w4, w5, w6 ];
 
-vprint CurveRec, 2 : "";
-vprint CurveRec : "Calculate theta derivatives...";
+vprint CurveRec : "";
+vprint CurveRec : "Calculating theta derivatives...";
 theta_derss := [ ThetaDerivatives(taunew, w) : w in ws ];
-vprint CurveRec : "done.";
+vprint CurveRec : "done calculating theta derivatives.";
 
 /* Determination of ratios = roots */
 Hs := [ Matrix(CC, [ theta_ders ]) * P1inew : theta_ders in theta_derss ];
@@ -289,10 +289,10 @@ w5 := (1/2)*taunew*Transpose(Matrix(CC, [[1,1]])) + (1/2)*Transpose(Matrix(CC, [
 w6 := (1/2)*taunew*Transpose(Matrix(CC, [[1,1]])) + (1/2)*Transpose(Matrix(CC, [[1,0]]));
 ws := [ w1, w2, w3, w4, w5, w6 ];
 
-vprint CurveRec, 2 : "";
-vprint CurveRec : "Calculate theta derivatives...";
+vprint CurveRec : "";
+vprint CurveRec : "Calculating theta derivatives...";
 theta_derss := [ ThetaDerivatives(taunew, w) : w in ws ];
-vprint CurveRec : "done.";
+vprint CurveRec : "done calculating theta derivatives.";
 
 /* Determination of ratios = roots */
 Hs := [ Matrix(CC, [ theta_ders ]) * P1inew : theta_ders in theta_derss ];
@@ -315,6 +315,8 @@ RCC := PolynomialRing(CC);
 fCC := &*[ RCC.1 - rat : rat in rats ];
 
 /* Identify correct twist */
+vprint CurveRec : "";
+vprint CurveRec : "Identifying correct twist...";
 Y := SE_Curve(fCC, 2 : Prec := Precision(CC));
 Q := ChangeRing(Y`BigPeriodMatrix, CC) / 2;
 homs := GeometricHomomorphismRepresentationCC(P, Q);
@@ -328,6 +330,8 @@ Ker := IntegralLeftKernel(M);
 row := Eltseq(Rows(Ker)[1]);
 Lambda := &+[ row[i]*As[i] : i in [1..#As] ];
 lam := Lambda[1,1];
+vprint CurveRec : "";
+vprint CurveRec : "done identifying correct twist.";
 
 /* Recover twisted polynomial over number field */
 fCC := lam^2*fCC; coeffsCC := Coefficients(fCC);
@@ -355,9 +359,12 @@ R := PolynomialRing(L);
 f := &+[ coeffs[i]*R.1^(i - 1) : i in [1..#coeffs] ];
 Y := HyperellipticCurve(f);
 
+vprint CurveRec : "";
+vprint CurveRec : "Certifying analytic map...";
 Q := ChangeRing(PeriodMatrix([ fCC ], [ f ]), CC);
 /* The next line functions as an assertion */
 R := HomologyRepresentation(IdentityMatrix(CC, 2), P, Q);
+vprint CurveRec : "done certifying analytic map.";
 return Y, hKL;
 
 end function;
