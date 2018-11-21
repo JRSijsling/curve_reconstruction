@@ -77,6 +77,8 @@ end intrinsic;
 function IntegerReduceMatrixG2(tau)
 // Implementation by Marco Streng
 CC := BaseRing(tau);
+assert Abs(tau[2,1] - tau[1,2]) lt CC`epscomp;
+tau[1,2] := tau[2,1];
 tauZZ := Matrix(CC, [ [ Ceiling(Re(c) - (1/2)) : c in Eltseq(row) ] : row in Rows(tau) ]);
 return tau - tauZZ, -tauZZ;
 end function;
@@ -116,6 +118,7 @@ function MinkowskiReductionG2CC(tau)
 // Implementation by Marco Streng
 CC := BaseRing(tau); RR := RealField(CC);
 assert Abs(tau[2,1] - tau[1,2]) lt CC`epscomp;
+tau[1,2] := tau[2,1];
 M := Matrix(RR, [ [ Im(c) : c in Eltseq(row) ] : row in Rows(tau) ]);
 _, T := MinkowskiReductionG2RR(M);
 T := ChangeRing(T, CC);
@@ -140,6 +143,8 @@ end function;
 function GottschlingReduce(tau)
 // Implementation by Marco Streng
 CC := BaseRing(tau); RR := RealField(CC);
+assert Abs(tau[2,1] - tau[1,2]) lt CC`epscomp;
+tau[1,2] := tau[2,1];
 Ns := [ ChangeRing(N, CC) : N in GottschlingMatrices() ];
 impr := RR ! 1; found_impr := false;
 for N in Ns do
@@ -156,7 +161,7 @@ if not found_impr then
     T := IdentityMatrix(CC, 4);
 end if;
 taured := LeftActionHg(T, tau);
-return taured, T, found_impr;
+return taured, T, not found_impr;
 end function;
 
 
