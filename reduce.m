@@ -2,26 +2,25 @@
  *  Reduction of matrices under the action of the symplectic group
  *
  *  Written by Jeroen Sijsling (jeroen.sijsling@uni-ulm.de)
+ *  using implementations by Marco Streng
  *
  *  See LICENSE.txt for license details.
  */
 
 
 function IsSymmetricImproved(M : prec := 0)
-/* To avoid stupid behavior of IsSymmetric */
+/* To avoid stupid numerical behavior of IsSymmetric */
 if prec eq 0 then
-    CC := BaseRing(M); prec := Precision(CC) - 17;
+    CC := BaseRing(M); prec := Floor(-Log(CC`epscomp)/Log(10));
 end if;
-CCSmall := ComplexField(prec);
 return Max([ Abs(c) : c in Eltseq(M - Transpose(M)) ]) lt 10^(-prec);
-return IsSymmetric(ChangeRing(M, CCSmall));
 end function;
 
 
 function IsPositiveDefiniteImproved(M : prec := 0);
-/* To avoid stupid behavior of IsPositiveDefinite */
+/* To avoid stupid numerical behavior of IsPositiveDefinite */
 if prec eq 0 then
-    RR := BaseRing(M); prec := Precision(RR) - 17;
+    RR := BaseRing(M); prec := Floor(-Log(RR`epscomp)/Log(10));
 end if;
 RRSmall := RealField(prec);
 /* Deal with zero entries that are represented by 10^(-N) */
@@ -61,27 +60,134 @@ end intrinsic;
 
 intrinsic IsBigPeriodMatrix(P::.) -> BoolElt
 {Returns whether P is (numerically) a big period matrix.}
-g := #Rows(P);
-P1 := Submatrix(P, 1,1,   g,g); P1i := P1^(-1);
-P2 := Submatrix(P, 1,g+1, g,g);
-tau := P1i*P2;
-return IsSmallPeriodMatrix(tau);
+return IsSmallPeriodMatrix(SmallPeriodMatrix(P));
 end intrinsic;
 
 
 intrinsic LeftActionHg(M::AlgMatElt, tau::AlgMatElt) -> AlgMatElt
 {Left symplectic action (by some definitions)}
-
 assert IsSmallPeriodMatrix(tau);
 g := #Rows(tau);
 A := Submatrix(M, 1,  1, g,g); B := Submatrix(M, 1,  g+1, g,g);
 C := Submatrix(M, g+1,1, g,g); D := Submatrix(M, g+1,g+1, g,g);
 return (A*tau + B)*((C*tau + D)^(-1));
-
 end intrinsic;
 
 
-function LLLReduceMatrix(tau);
+function IntegerReduceMatrixG2(tau)
+// Implementation by Marco Streng
+CC := BaseRing(tau);
+tauZZ := Matrix(CC, [ [ Ceiling(Re(c) - (1/2)) : c in Eltseq(row) ] : row in Rows(tau) ]);
+return tau - tauZZ, -tauZZ;
+end function;
+
+
+function MinkowskiReductionG2RR(M)
+// Implementation by Marco Streng
+RR := BaseRing(M);
+assert Determinant(M) gt 0;
+assert Abs(M[1,2] - M[2,1]) le RR`epscomp;
+assert M[1,1] gt 0;
+Mred := M; T := IdentityMatrix(RR, 2);
+done := false;
+while not done do
+    r := Floor(-Mred[1,2]/Mred[1,1] + (1/2));
+    R := Matrix(RR, [[1,0],[r,1]]);
+    T := R*T;
+    Mred := R*Mred*Transpose(R);
+    if Mred[1,1] gt Mred[2,2] then
+        U := Matrix(RR, [[0,1],[-1,0]]);
+        T := U*T;
+        Mred := U*Mred*Transpose(U);
+    else
+        done := true;
+    end if;
+end while;
+if Mred[1,2] lt 0 then
+    U := Matrix(RR, [[1,0],[0,-1]]);
+    T := U*T;
+    Mred := U*Mred*Transpose(U);
+end if;
+return Mred, T;
+end function;
+
+
+function MinkowskiReductionG2CC(tau)
+// Implementation by Marco Streng
+CC := BaseRing(tau); RR := RealField(CC);
+assert Abs(tau[2,1] - tau[1,2]) lt CC`epscomp;
+M := Matrix(RR, [ [ Im(c) : c in Eltseq(row) ] : row in Rows(tau) ]);
+_, T := MinkowskiReductionG2RR(M);
+T := ChangeRing(T, CC);
+taured := T*tau*Transpose(T);
+return taured, T;
+end function;
+
+
+function GottschlingMatrices()
+// Implementation by Marco Streng
+Ms := [ ];
+Ms cat:= [ Matrix([[0,0,-1,0],[0,1,0,0],[1,0,e,0],[0,0,0,1]]) : e in [-1,0,1] ];
+Ms cat:= [ Matrix([[1,0,0,0] ,[0,0,0,-1],[0,0,1,0],[0,1,0,e]]) : e in [-1,0,1] ];
+Ms cat:= [ Matrix([[0,0,-1,0],[0,1,0,0],[1,-1,e,0],[0,0,1,1]]) : e in [-2,-1,0,1,2] ];
+CP := CartesianPower([-1,0,1], 3);
+CP := [ [ c : c in tup ] : tup in CP ];
+Ms cat:= [ Matrix([[0,0,-1,0],[0,0,0,-1],[1,0,tup[1],tup[3]],[0,1,tup[3],tup[2]]]) : tup in CP ];
+return Ms;
+end function;
+
+
+function GottschlingReduce(tau)
+// Implementation by Marco Streng
+CC := BaseRing(tau); RR := RealField(CC);
+Ns := [ ChangeRing(N, CC) : N in GottschlingMatrices() ];
+impr := RR ! 1; found_impr := false;
+for N in Ns do
+    C := Submatrix(N, 3,1, 2,2);
+    D := Submatrix(N, 3,3, 2,2);
+    impr_new := Abs(Determinant(C*tau + D));
+    if impr_new lt impr then
+        T := N;
+        impr := impr_new;
+        found_impr := true;
+    end if;
+end for;
+if not found_impr then
+    T := IdentityMatrix(CC, 4);
+end if;
+taured := LeftActionHg(T, tau);
+return taured, T, found_impr;
+end function;
+
+
+function ReduceSmallPeriodMatrixG2(tau)
+// Implementation by Marco Streng
+CC := BaseRing(tau);
+
+taured := tau; T := IdentityMatrix(CC, 4);
+repeat
+    taured, gamma := MinkowskiReductionG2CC(taured);
+    U := BlockMatrix([ [ gamma, 0 ], [ 0, Transpose(gamma^(-1)) ] ]);
+    T := U*T;
+
+    taured, gamma := IntegerReduceMatrixG2(taured);
+    U := BlockMatrix([ [ 1, gamma ], [ 0, 1 ] ]);
+    T := U*T;
+
+    taured, U, done := GottschlingReduce(taured);
+    T := U*T;
+until done;
+
+assert Abs(taured[2,1] - taured[1,2]) lt CC`epscomp;
+taured[2,1] := taured[1,2];
+assert IsSmallPeriodMatrix(taured);
+TZZ := Matrix(Integers(), [ [ Round(c) : c in Eltseq(row) ] : row in Rows(T) ]);
+assert IsSymplecticMatrix(TZZ);
+return taured, T;
+end function;
+
+
+function LLLReduceMatrixG3(tau);
 assert IsSmallPeriodMatrix(tau);
 tau[2,1] := tau[1,2]; tau[3,1] := tau[1,3]; tau[3,2] := tau[2,3];
 Imtau := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(tau) ]);
@@ -90,253 +196,10 @@ return T*tau*Transpose(T);
 end function;
 
 
-function IntegerReduceMatrix(tau);
+function IntegerReduceMatrixG3(tau);
 tauZZ := Matrix([ [ Round(Re(c)) : c in Eltseq(row) ] : row in Rows(tau) ]);
 tauZZ[2,1] := tauZZ[1,2]; tauZZ[3,1] := tauZZ[1,3]; tauZZ[3,2] := tauZZ[2,3];
 return tau - ChangeRing(tauZZ, BaseRing(tau));
-end function;
-
-
-function MinkowskiTestG2(tau)
-
-a := Im(tau[1,1]); b := Im(tau[1,2]); c := Im(tau[2,2]);
-return (c ge a) and (a ge 2*b) and (2*b ge 0);
-
-end function;
-
-
-function ReduceSmallPeriodMatrixG2Minkowski(tau)
-// Dupont; end result is U*tau_orig*Transpose(U)
-tau[2,1] := tau[1,2];
-assert IsSmallPeriodMatrix(tau);
-CC := BaseRing(tau); RR := RealField(CC);
-
-t := true; U := Matrix(CC, [[1,0],[0,1]]);
-while t do
-    if 2*Abs(Im(tau[1,2])) le Abs(Im(tau[1,1])) then
-        if Abs(Im(tau[1,1])) le Abs(Im(tau[2,2])) then
-            if Im(tau[1,2]) le 0 then
-                T := Matrix(CC, [[1,0],[0,-1]]);
-                tau := T*tau*Transpose(T);
-                U := T*U;
-                tau[2,1] := tau[1,2];
-                if MinkowskiTestG2(tau) then
-                    assert IsSmallPeriodMatrix(tau);
-                    return tau, U;
-                end if;
-            end if;
-            t := false;
-        else
-            T := Matrix(CC, [[0,1],[-1,0]]);
-            tau := T*tau*Transpose(T);
-            U := T*U;
-            tau[2,1] := tau[1,2];
-            if MinkowskiTestG2(tau) then
-                assert IsSmallPeriodMatrix(tau);
-                return tau, U;
-            end if;
-        end if;
-    end if;
-    q := Round(Im(tau[1,2]) / Im(tau[1,1]));
-    T := Matrix(CC, [[1,0],[-q,1]]);
-    tau := T*tau*Transpose(T);
-    U := T*U;
-    tau[2,1] := tau[1,2];
-    if MinkowskiTestG2(tau) then
-        assert IsSmallPeriodMatrix(tau);
-        return tau, U;
-    end if;
-end while;
-tau[2,1] := tau[1,2];
-assert IsSmallPeriodMatrix(tau);
-assert MinkowskiTestG2(tau);
-return tau, U;
-
-end function;
-
-
-function ReduceSmallPeriodMatrixG2(tau)
-// Dupont; end result is U*tau_orig*Transpose(U)
-CC := BaseRing(tau); RR := RealField(CC);
-
-Ms := [
-Matrix(CC, [
-[1 , 0 , 1 , 0],
-[0 , 1 , 0 , 0],
-[0 , 0 , 1 , 0],
-[0 , 0 , 0 , 1]
-]),
-Matrix(CC, [
-[1 , 0 , 0 , 0],
-[0 , 1 , 0 , 1],
-[0 , 0 , 1 , 0],
-[0 , 0 , 0 , 1]
-]),
-Matrix(CC, [
-[1 , 0 , 0 , 1],
-[0 , 1 , 1 , 0],
-[0 , 0 , 1 , 0],
-[0 , 0 , 0 , 1]
-])
-];
-
-Ns := [
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 , 0 , 0],
-[0 , 1 , 0 , 0]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 , 1 , 0],
-[0 , 1 , 0 , 0]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 ,-1 , 0],
-[0 , 1 , 0 , 0]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 , 0 , 0],
-[0 , 1 , 0 , 1]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 , 0 , 0],
-[0 , 1 , 0 ,-1]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 , 1 , 0],
-[0 , 1 , 0 , 1]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 ,-1 , 0],
-[0 , 1 , 0 ,-1]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 ,-1 , 0],
-[0 , 1 , 0 , 1]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 , 1 , 0],
-[0 , 1 , 0 ,-1]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 , 0 , 1],
-[0 , 1 , 1 , 0]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 , 0 ,-1],
-[0 , 1 ,-1 , 0]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 , 1 , 1],
-[0 , 1 , 1 , 0]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 ,-1 ,-1],
-[0 , 1 ,-1 , 0]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 , 0 , 1],
-[0 , 1 , 1 , 1]
-]),
-Matrix(CC, [
-[0 , 0 ,-1 , 0],
-[0 , 0 , 0 ,-1],
-[1 , 0 , 0 ,-1],
-[0 , 1 ,-1 ,-1]
-]),
-Matrix(CC, [
-[1 , 0 ,-1 , 0],
-[0 , 1 , 0 ,-1],
-[1 , 0 , 0 , 0],
-[0 , 0 , 0 , 1]
-]),
-Matrix(CC, [
-[1 , 0 ,-1 , 0],
-[0 , 1 , 0 ,-1],
-[1 , 0 , 0 , 0],
-[0 , 0 , 0 , 1]
-]),
-Matrix(CC, [
-[1 , 0 ,-1 , 0],
-[0 , 1 , 0 ,-1],
-[0 , 0 , 1 , 0],
-[0 , 1 , 0 , 0]
-]),
-Matrix(CC, [
-[1 , 0 , 0 , 0],
-[0 , 1 , 0 , 0],
-[1 ,-1 , 1 , 0],
-[-1, 1 , 0 , 1]
-]),
-Matrix(CC, [
-[-1, 0 , 0 , 0],
-[0 ,-1 , 0 , 0],
-[1 ,-1 ,-1 , 0],
-[-1, 1 , 0 ,-1]
-])
-];
-
-gamma := IdentityMatrix(CC, 4); taup := tau; t := true;
-counter := 0;
-while t do
-    counter +:= 1;
-    taup, U := ReduceSmallPeriodMatrixG2Minkowski(taup);
-    gamma := BlockMatrix([ [U, 0], [0, Transpose(U^(-1))] ]) * gamma;
-    taupjs := [ taup[1,1], taup[2,2], taup[1,2] ];
-    for j:=1 to 3 do
-        M := Ms[j];
-        a := -Round(Re(taupjs[j]));
-        taup := LeftActionHg(M^a, taup);
-        gamma := M^a * gamma;
-    end for;
-    t := false;
-    for j:=1 to 19 do
-        N := Ns[j];
-        C := Submatrix(N, 3,1, 2,2);
-        D := Submatrix(N, 3,3, 2,2);
-        if Abs(Determinant(C*taup + D)) lt 1 then
-            t := true;
-            taup := LeftActionHg(N, taup);
-            gamma := N * gamma;
-            //break;
-        end if;
-    end for;
-    /* TODO: Find something that works better */
-    if counter eq 10^3 then
-        t := false;
-    end if;
-end while;
-
-taup[2,1] := taup[1,2];
-assert IsSmallPeriodMatrix(taup);
-return taup, gamma;
 end function;
 
 
@@ -350,8 +213,8 @@ N0 := Matrix(Integers(), [
 [  0,  0,  0,  0,  0,  1]
 ]);
 while true do
-    tau := LLLReduceMatrix(tau);
-    tau := IntegerReduceMatrix(tau);
+    tau := LLLReduceMatrixG3(tau);
+    tau := IntegerReduceMatrixG3(tau);
     if Abs(tau[1,1]) gt 0.99 then
         return tau;
     end if;

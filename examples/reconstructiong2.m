@@ -6,8 +6,8 @@
  *  See LICENSE.txt for license details.
  */
 
-SetVerbose("EndoFind", 0);
-SetVerbose("CurveRec", 1);
+SetVerbose("EndoFind", 2);
+SetVerbose("CurveRec", 2);
 
 prec := 500;
 F := RationalsExtra(prec);
@@ -39,6 +39,8 @@ P1 := Submatrix(P, 1,1, 2,2); P1i := P1^(-1);
 P2 := Submatrix(P, 1,3, 2,2);
 tau := P1i*P2;
 
+/*
+// Reconstruction from invariants takes far too long here
 print "Geometric reconstruction:";
 Y := ReconstructCurveGeometric(tau, F);
 print Y;
@@ -48,6 +50,7 @@ print "Geometric reconstruction over base:";
 Y := ReconstructCurveGeometric(tau, F : Base := true);
 print Y;
 print "";
+*/
 
 print "Arithmetic reconstruction over base:";
 X := ReconstructCurve(P, F : Base := true);
