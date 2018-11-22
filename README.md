@@ -6,7 +6,7 @@ This repository contains Magma code for reconstructing hyperelliptic curves of g
 Prerequisites
 -------------
 
-You need [`https://github.com/edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms) to install this repository.
+You need [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms) to install this repository.
 
 Installation
 ------------
@@ -24,7 +24,7 @@ Credits
 
 This implementation is based on the following works. When using this package, please be aware of the work that you are indirectly applying and please cite it.
 
-For geometric reconstruction in genus 3 (also see [their own `SageMath` implementation](`https://github.com/christellevincent/genus3`):
+For geometric reconstruction in genus 3 (also see their own `SageMath` implementation at [`christellevincent/genus3`](https://github.com/christellevincent/genus3):
 
 Balakrishnan, Jennifer; Ionica, Sorina; Lauter, Kristin; Vincent, Christelle:  
 *Constructing genus-3 hyperelliptic Jacobians with CM.* (English summary)  
@@ -42,4 +42,4 @@ Labrande, Hugo; Thomé, Emmanuel:
 *Computing theta functions in quasi-linear time in genus 2 and above.*  
 LMS J. Comput. Math. 19 (2016), suppl. A, pp. 163–-177.
 
-Finally, this work uses the reduction of genus 2 small period matrices as implemented by Marco Streng and his collaborators in [mstreng/recip](https://github.com/mstreng/recip).
+Finally, this work uses the reduction of genus 2 small period matrices as implemented by Marco Streng and his collaborators in [`mstreng/recip`](https://github.com/mstreng/recip).
