@@ -253,7 +253,7 @@ return Y, hKL;
 end function;
 
 
-function ReconstructCurveG2(P, K : Base := false)
+function ReconstructCurveG2(P, K : Base := false, Dom := [-5..5])
 // Reconstruct curve from period matrix P, returned over an extension of the
 // base field K.
 
@@ -276,7 +276,8 @@ A := Transpose(Submatrix(gamma, 1,1, 2,2));
 B := Transpose(Submatrix(gamma, 1,3, 2,2));
 C := Transpose(Submatrix(gamma, 3,1, 2,2));
 D := Transpose(Submatrix(gamma, 3,3, 2,2));
-Pnew := P * BlockMatrix([[D, B], [C, A]]);
+T := BlockMatrix([[D, B], [C, A]]);
+Pnew := P * T;
 P1new := Submatrix(Pnew, 1,1, 2,2); P1inew := P1new^(-1);
 P2new := Submatrix(Pnew, 1,3, 2,2);
 
@@ -314,22 +315,43 @@ end for;
 RCC := PolynomialRing(CC);
 fCC := &*[ RCC.1 - rat : rat in rats ];
 
-/* Identify correct twist */
+/* Finding homomorphisms to original matrix */
 vprint CurveRec : "";
 vprint CurveRec : "Identifying correct twist...";
 Y := SE_Curve(fCC, 2 : Prec := Precision(CC));
 Q := ChangeRing(Y`BigPeriodMatrix, CC) / 2;
 homs := GeometricHomomorphismRepresentationCC(P, Q);
-As := [ hom[1] : hom in homs ];
+As := [ hom[1] : hom in homs ]; Rs := [ hom[2] : hom in homs ];
 if #As eq 0 then
-    error "No geometric homomorphism found: increase precision or bound in calculating theta derivatives";
+    error "No geometric homomorphism to original matrix found: increase precision or bound in calculating theta derivatives";
 end if;
 
+/*  Identify correct twist */
 M := Matrix([ [ Re(A[1,1] - A[2,2]), Im(A[1,1] - A[2,2]), Re(A[1,2]), Im(A[1,2]), Re(A[2,1]), Im(A[2,1]) ] : A in As ]);
-Ker := IntegralLeftKernel(M);
-row := Eltseq(Rows(Ker)[1]);
-Lambda := &+[ row[i]*As[i] : i in [1..#As] ];
-lam := Lambda[1,1];
+Ker := IntegralLeftKernel(M); rows := Rows(Ker);
+if #rows eq 1 then
+    row := Eltseq(rows[1]);
+    Lambda := &+[ row[i]*As[i] : i in [1..#As] ];
+    lam := Lambda[1,1];
+
+else
+    found := false;
+    CP := CartesianPower(Dom, #rows);
+    for tup in CP do
+        row := &+[ tup[i]*rows[i] : i in [1..#rows] ];
+        Lambda := &+[ row[i]*As[i] : i in [1..#As] ];
+        R := &+[ row[i]*Rs[i] : i in [1..#Rs] ];
+        if Abs(Determinant(R)) eq 1 then
+            lam := Lambda[1,1];
+            found := true;
+            break;
+        end if;
+    end for;
+
+    if not found then
+        error "Failed to identify correct twist";
+    end if;
+end if;
 vprint CurveRec : "";
 vprint CurveRec : "done identifying correct twist.";
 
@@ -359,12 +381,9 @@ R := PolynomialRing(L);
 f := &+[ coeffs[i]*R.1^(i - 1) : i in [1..#coeffs] ];
 Y := HyperellipticCurve(f);
 
-vprint CurveRec : "";
-vprint CurveRec : "Certifying analytic map...";
 Q := ChangeRing(PeriodMatrix([ fCC ], [ f ]), CC);
 /* The next line functions as an assertion */
 R := HomologyRepresentation(IdentityMatrix(CC, 2), P, Q);
-vprint CurveRec : "done certifying analytic map.";
 return Y, hKL;
 
 end function;

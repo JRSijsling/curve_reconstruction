@@ -7,7 +7,7 @@
  */
 
 
-intrinsic ThetaDerivatives(tau::AlgMatElt, w::ModMatRngElt : B := 40) -> SeqEnum
+intrinsic ThetaDerivatives(tau::AlgMatElt, w::ModMatRngElt : B := 50) -> SeqEnum
 {Calculates the derivative of the standard theta function at w with respect to all variables z_i.}
 /* TODO: Makes this fast after Labrande--Thomé */
 

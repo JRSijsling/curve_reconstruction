@@ -170,7 +170,14 @@ function ReduceSmallPeriodMatrixG2(tau)
 CC := BaseRing(tau);
 
 taured := tau; T := IdentityMatrix(CC, 4);
+counter := 0;
 repeat
+    counter +:= 1;
+    if counter mod 10^3 eq 0 then
+        vprint CurveRec : "Counter:", counter;
+        break;
+    end if;
+
     taured, gamma := MinkowskiReductionG2CC(taured);
     U := BlockMatrix([ [ gamma, 0 ], [ 0, Transpose(gamma^(-1)) ] ]);
     T := U*T;
