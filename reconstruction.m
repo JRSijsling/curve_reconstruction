@@ -114,13 +114,30 @@ P2 := Submatrix(P, 1,2, 1,1);
 tau := P1i*P2; CC := BaseRing(Parent(tau));
 assert IsSmallPeriodMatrix(tau);
 
+/* Reduce small period matrix */
+taunew, gamma := ReduceSmallPeriodMatrix(tau);
+Imtaunew := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(taunew) ]);
+
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2 : "Eigenvalues of imaginary part of reduced tau:";
+vprint CurveRec, 2 : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
+
+/* Calculate corresponding big period matrix */
+A := Transpose(Submatrix(gamma, 1,1, 1,1));
+B := Transpose(Submatrix(gamma, 1,2, 1,1));
+C := Transpose(Submatrix(gamma, 2,1, 1,1));
+D := Transpose(Submatrix(gamma, 2,2, 1,1));
+Pnew := P * BlockMatrix([[D, B], [C, A]]);
+P1new := Submatrix(Pnew, 1,1, 1,1); P1inew := P1new^(-1);
+P2new := Submatrix(Pnew, 1,2, 1,1);
+
 /* Classical elliptic functions */
-CC := Parent(P[1,1]); RR := RealField(CC);
-if Im(P[1,2]/P[1,1]) lt 0 then
-    P := Matrix([ [ P[1,2], P[1,1] ] ]);
+CC := Parent(Pnew[1,1]); RR := RealField(CC);
+if Im(Pnew[1,2]/Pnew[1,1]) lt 0 then
+    Pnew := Matrix([ [ Pnew[1,2], Pnew[1,1] ] ]);
 end if;
-g4CC := 120 * (1/P[1,1])^4 * ZetaFunction(RR, 4) * Eisenstein(4, Eltseq(P));
-g6CC := 280 * (1/P[1,1])^6 * ZetaFunction(RR, 6) * Eisenstein(6, Eltseq(P));
+g4CC := 120 * (1/Pnew[1,1])^4 * ZetaFunction(RR, 4) * Eisenstein(4, Eltseq(Pnew));
+g6CC := 280 * (1/Pnew[1,1])^6 * ZetaFunction(RR, 6) * Eisenstein(6, Eltseq(Pnew));
 
 if Base then
     if Type(K) eq FldRat then

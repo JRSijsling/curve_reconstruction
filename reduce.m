@@ -74,6 +74,42 @@ return (A*tau + B)*((C*tau + D)^(-1));
 end intrinsic;
 
 
+function IntegerReduceMatrixG1(tau)
+CC := BaseRing(tau);
+tauZZ := Matrix(CC, [ [ Ceiling(Re(c) - (1/2)) : c in Eltseq(row) ] : row in Rows(tau) ]);
+U := Matrix(CC, [ [ 1, -tauZZ[1,1] ], [ 0, 1 ] ]);
+return tau - tauZZ, U;
+end function;
+
+
+function InverseReduceMatrixG1(tau)
+CC := BaseRing(tau);
+if Abs(tau[1,1]) ge 1 then
+    U := IdentityMatrix(CC, 2);
+    return tau, U, true;
+end if;
+U := Matrix(CC, [ [ 0, -1 ], [ 1, 0 ] ]);
+return Matrix(CC, [[ -1/tau[1,1] ]]), U, false;
+end function;
+
+
+function ReduceSmallPeriodMatrixG1(tau)
+CC := BaseRing(tau); taured := tau; T := IdentityMatrix(CC, 2);
+repeat
+    taured, U := IntegerReduceMatrixG1(taured);
+    T := U*T;
+
+    taured, U, done := InverseReduceMatrixG1(taured);
+    T := U*T;
+until done;
+
+assert IsSmallPeriodMatrix(taured);
+TZZ := Matrix(Integers(), [ [ Round(c) : c in Eltseq(row) ] : row in Rows(T) ]);
+assert IsSymplecticMatrix(TZZ);
+return taured, T;
+end function;
+
+
 function IntegerReduceMatrixG2(tau)
 // Implementation by Marco Streng
 CC := BaseRing(tau);
@@ -162,9 +198,7 @@ end function;
 
 function ReduceSmallPeriodMatrixG2(tau)
 // Implementation by Marco Streng
-CC := BaseRing(tau);
-
-taured := tau; T := IdentityMatrix(CC, 4);
+CC := BaseRing(tau); taured := tau; T := IdentityMatrix(CC, 4);
 repeat
     taured, gamma := MinkowskiReductionG2CC(taured);
     U := BlockMatrix([ [ gamma, 0 ], [ 0, Transpose(gamma^(-1)) ] ]);
@@ -227,7 +261,9 @@ intrinsic ReduceSmallPeriodMatrix(tau::.) -> .
 {Reduces a small period matrix after Labrande--Thomé.}
 assert IsSmallPeriodMatrix(tau);
 g := #Rows(tau);
-if g eq 2 then
+if g eq 1 then
+    return ReduceSmallPeriodMatrixG1(tau);
+elif g eq 2 then
     return ReduceSmallPeriodMatrixG2(tau);
 elif g eq 3 then
     return ReduceSmallPeriodMatrixG3(tau);
