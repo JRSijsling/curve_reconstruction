@@ -27,7 +27,7 @@ function RationalReconstruction(r);
         e := -p;
     end if;
     if -e lt p/2 then
-        return false;
+        return false, 0;
     end if;
     best := 0;
     i := p div 10;
@@ -38,9 +38,9 @@ function RationalReconstruction(r);
         b := BestApproximation(r1, 10^i);
     end while;
     if b ne best then
-        return false;
+        return false, 0;
     else
-        return b, i;
+        return true, b;
     end if;
 end function;
 
@@ -83,12 +83,12 @@ assert IsSmallPeriodMatrix(tau);
 jCC := jInvariant(tau[1,1]);
 if Base then
     if Type(K) eq FldRat then
-        j := RationalReconstruction(jCC);
+        test, j := RationalReconstruction(jCC);
     else
         test, j := AlgebraizeElement(jCC, K);
-        if not test then
-            error "Failed to algebraize in given field";
-        end if;
+    end if;
+    if not test then
+        error "Failed to algebraize in given field";
     end if;
     hKL := CanonicalInclusionMap(K, K);
 else
@@ -141,17 +141,14 @@ g6CC := 280 * (1/Pnew[1,1])^6 * ZetaFunction(RR, 6) * Eisenstein(6, Eltseq(Pnew)
 
 if Base then
     if Type(K) eq FldRat then
-        g4 := RationalReconstruction(g4CC);
-        g6 := RationalReconstruction(g6CC);
-        if Type(g4) eq BoolElt or Type(g6) eq BoolElt then
-            error "Failed to algebraize as a rational number";
-        end if;
+        test4, g4 := RationalReconstruction(g4CC);
+        test6, g6 := RationalReconstruction(g6CC);
     else
         testg4, g4 := AlgebraizeElement(g4CC, K);
         testg6, g6 := AlgebraizeElement(g6CC, K);
-        if not (testg4 and testg6) then
-            error "Failed to algebraize in given field";
-        end if;
+    end if;
+    if not (testg4 and testg6) then
+        error "Failed to algebraize in given field";
     end if;
     L := K; hKL := CanonicalInclusionMap(K, L);
 else
@@ -234,19 +231,19 @@ fCC := &*[ RCC.1 - rat : rat in rats ];
 ICC := IgusaInvariants(fCC); W := [ 2, 4, 6, 8, 10 ];
 ICC := WPSNormalizeCC(W, ICC);
 if Base then
-    if Type(K) eq FldRat then
-        I := [ RationalReconstruction(iCC) : iCC in ICC ];
-    else
-        I := [ ];
-        for iCC in ICC do
+    I := [ ];
+    for iCC in ICC do
+        if Type(K) eq FldRat then
+            test, i := RationalReconstruction(iCC);
+        else
             test, i := AlgebraizeElement(iCC, K);
-            if not test then
-                error "Failed to algebraize in given field";
-            end if;
-            Append(~I, i);
-        end for;
-    end if;
-    hKL := CanonicalInclusionMap(K, K);
+        end if;
+        if not test then
+            error "Failed to algebraize in given field";
+        end if;
+        Append(~I, i);
+    end for;
+    L := K; hKL := CanonicalInclusionMap(K, L);
 else
     L, I, hKL := NumberFieldExtra(ICC, K);
 end if;
@@ -377,21 +374,21 @@ fCC := lam^2*fCC; coeffsCC := Coefficients(fCC);
 coeffsCC := ChangeUniverse(coeffsCC, K`CC);
 
 if Base then
-    if Type(K) eq FldRat then
-        coeffs := [ RationalReconstruction(coeffCC) : coeffCC in coeffsCC ];
-    else
-        coeffs := [ ];
-        for coeffCC in coeffsCC do
+    coeffs := [ ];
+    for coeffCC in coeffsCC do
+        if Type(K) eq FldRat then
+            test, coeff := RationalReconstruction(coeffCC);
+        else
             test, coeff := AlgebraizeElement(coeffCC, K);
-            if not test then
-                error "Failed to algebraize in given field";
-            end if;
-            Append(~coeffs, coeff);
-        end for;
-    end if;
+        end if;
+        if not test then
+            error "Failed to algebraize in given field";
+        end if;
+        Append(~coeffs, coeff);
+    end for;
     L := K; hKL := CanonicalInclusionMap(K, L);
 else
-    L, coeffs, hKL := NumberFieldExtra(coeffsCC, K);
+    L, I, hKL := NumberFieldExtra(coeffsCC, K);
 end if;
 
 R := PolynomialRing(L);
@@ -410,7 +407,9 @@ function ReconstructCurveGeometricG3(tau, K : Base := Base)
 
 /* Calculate thetas and see in which case we are */
 assert IsSmallPeriodMatrix(tau);
-thetas := ThetaValues(tau);
+taunew := ReduceSmallPeriodMatrix(tau);
+assert IsSmallPeriodMatrix(taunew);
+thetas := ThetaValues(taunew);
 thetas_sq := [ theta^2 : theta in thetas ];
 
 vprint CurveRec, 2 : "";
@@ -422,20 +421,22 @@ if #v0s eq 0 then
     error "Uncomment relevant section of curve_reconstruction/reconstruction.m";
     /*
     ICC := DixmierOhnoInvariantsFromThetas(thetas);
+
     if Base then
-        if Type(K) eq FldRat then
-            I := [ RationalReconstruction(iCC) : iCC in ICC ];
-        else
-            I := [ ];
-            for iCC in ICC do
+        I := [ ];
+        for iCC in ICC do
+            if Type(K) eq FldRat then
+                test, i := RationalReconstruction(iCC);
+            else
                 test, i := AlgebraizeElement(iCC, K);
-                if not test then
-                    error "Failed to algebraize in given field";
-                end if;
-                Append(~I, i);
-            end for;
-        end if;
-        hKL := CanonicalInclusionMap(K, K);
+            end if;
+            if not test then
+                error "Failed to algebraize in given field";
+            end if;
+            Append(~I, i);
+        end for;
+        L := K; hKL := CanonicalInclusionMap(K, L);
+
     else
         L, I, hKL := NumberFieldExtra(ICC, K);
     end if;
@@ -444,25 +445,27 @@ if #v0s eq 0 then
     */
 
 elif #v0s eq 1 then
-    SCC := ShiodaInvariantsFromThetaSquares(thetas_sq);
+    ICC := ShiodaInvariantsFromThetaSquares(thetas_sq);
+
     if Base then
-        if Type(K) eq FldRat then
-            S := [ RationalReconstruction(sCC) : sCC in SCC ];
-        else
-            S := [ ];
-            for sCC in SCC do
-                test, s := AlgebraizeElement(sCC, K);
-                if not test then
-                    error "Failed to algebraize in given field";
-                end if;
-                Append(~S, s);
-            end for;
-        end if;
-        hKL := CanonicalInclusionMap(K, K);
+        I := [ ];
+        for iCC in ICC do
+            if Type(K) eq FldRat then
+                test, i := RationalReconstruction(iCC);
+            else
+                test, i := AlgebraizeElement(iCC, K);
+            end if;
+            if not test then
+                error "Failed to algebraize in given field";
+            end if;
+            Append(~I, i);
+        end for;
+        L := K; hKL := CanonicalInclusionMap(K, L);
+
     else
-        L, S, hKL := NumberFieldExtra(SCC, K);
+        L, I, hKL := NumberFieldExtra(ICC, K);
     end if;
-    Y := HyperellipticCurveFromShiodaInvariants(S);
+    Y := HyperellipticCurveFromShiodaInvariants(I);
     return Y, hKL;
 
 else
@@ -470,3 +473,45 @@ else
 end if;
 
 end function;
+
+
+intrinsic AlgebraizedInvariants(tau::AlgMatElt, K::Fld) -> .
+{Returns invariants algebraized over given base.}
+
+/* Calculate thetas and see in which case we are */
+assert IsSmallPeriodMatrix(tau);
+taunew := ReduceSmallPeriodMatrix(tau);
+assert IsSmallPeriodMatrix(taunew);
+thetas := ThetaValues(taunew);
+thetas_sq := [ theta^2 : theta in thetas ];
+
+v0s := FindDelta(thetas_sq);
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2: "Number of non-zero even theta values:";
+print #v0s;
+
+if #v0s gt 1 then
+    return false, 0;
+end if;
+
+if #v0s eq 0 then
+    ICC := DixmierOhnoInvariantsFromThetas(thetas);
+else
+    ICC := ShiodaInvariantsFromThetaSquares(thetas_sq);
+end if;
+
+I := [ ];
+for iCC in ICC do
+    if Type(K) eq FldRat then
+        test, i := RationalReconstruction(iCC);
+    else
+        test, i := AlgebraizeElement(iCC, K);
+    end if;
+    if not test then
+        return false, 0;
+    end if;
+    Append(~I, i);
+end for;
+return true, I;
+
+end intrinsic;
