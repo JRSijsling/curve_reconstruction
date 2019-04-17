@@ -488,7 +488,7 @@ thetas_sq := [ theta^2 : theta in thetas ];
 v0s := FindDelta(thetas_sq);
 vprint CurveRec, 2 : "";
 vprint CurveRec, 2: "Number of non-zero even theta values:";
-print #v0s;
+vprint CurveRec, 2: #v0s;
 
 if #v0s gt 1 then
     return false, 0;

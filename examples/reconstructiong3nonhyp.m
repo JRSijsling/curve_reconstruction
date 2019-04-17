@@ -40,3 +40,7 @@ J, W := DixmierOhnoInvariants(Y);
 print "Inspect:";
 print X; print Y;
 print WPSNormalize(W, I) eq WPSNormalize(W, J);
+
+print "Arithmetic reconstruction over base:";
+Y := ReconstructCurve(P, F : Base := true);
+print Y;
