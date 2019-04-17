@@ -388,7 +388,7 @@ if Base then
     end for;
     L := K; hKL := CanonicalInclusionMap(K, L);
 else
-    L, I, hKL := NumberFieldExtra(coeffsCC, K);
+    L, coeffs, hKL := NumberFieldExtra(coeffsCC, K);
 end if;
 
 R := PolynomialRing(L);
