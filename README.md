@@ -6,18 +6,19 @@ This repository contains Magma code for reconstructing hyperelliptic curves of g
 Prerequisites
 -------------
 
-You need [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms) to install this repository.
+An installation of Magma and the dependency [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms).
 
 Installation
 ------------
 
-A copy of the computer algebra system Magma is needed to run this code. After being cloned or downloaded, it can be made to run upon startup of Magma by adding the lines
-
-`AttachSpec("[PATH]/spec");  `
-
-to the user's `.magmarc` file, which can typically be found in the home directory). Here `[PATH]` is to be replaced by the directory of the cloned and downloaded repository, so that one could for example have
-
-`AttachSpec("~/Programs/curve_reconstruction/spec");  `
+The subdirectory `curve_reconstruction/magma/` includes code that can be run purely within Magma. You can load all the Magma specific files by attaching the ``curve_reconstruction/magma/spec`` file with ``AttachSpec``. For example, if you start your session of Magma inside the git directory, you can do this by typing
+```
+AttachSpec("curve_reconstruction/magma/spec");
+```
+To make this independent of the directory in which you find yourself, you may prefer to indicate the relative path, like
+```
+AttachSpec("~/Programs/curve_reconstruction/magma/spec");
+```
 
 Credits
 -------

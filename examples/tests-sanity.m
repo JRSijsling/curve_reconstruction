@@ -12,7 +12,7 @@ import "../rosenhain.m": EtaFunction0, EtaFunction, EtaValue, UFromEtaFunction, 
 
 
 prec := 200;
-CC := ComplexField(prec);
+CC := ComplexFieldExtra(prec);
 R<x> := PolynomialRing(CC);
 
 //Define curve

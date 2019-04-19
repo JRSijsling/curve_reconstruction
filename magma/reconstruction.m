@@ -15,33 +15,16 @@ forward ReconstructCurveGeometricG2;
 forward ReconstructCurveGeometricG3;
 forward ReconstructCurveG1;
 forward ReconstructCurveG2;
+forward ReconstructCurveG3;
 
 
-function RationalReconstruction(r);
-    r1 := Real(r);
-    r2 := Imaginary(r);
-    p := Precision(r2);
-    if r2 ne Parent(r2) ! 0 then
-        e := Log(AbsoluteValue(r2));
-    else
-        e := -p;
+function TransformForm(f, T : co := true, contra := false)
+    R := Parent(f);
+    vars := Matrix([ [ mon ] : mon in MonomialsOfDegree(R, 1) ]);
+    if (not co) or contra then
+        return Evaluate(f, Eltseq(ChangeRing(Transpose(T)^(-1), R) * vars));
     end if;
-    if -e lt p/2 then
-        return false, 0;
-    end if;
-    best := 0;
-    i := p div 10;
-    b := BestApproximation(r1, 10^i);
-    while b ne best and i le p do
-        i +:= 5;
-        best := b;
-        b := BestApproximation(r1, 10^i);
-    end while;
-    if b ne best then
-        return false, 0;
-    else
-        return true, b;
-    end if;
+    return Evaluate(f, Eltseq(ChangeRing(T, R) * vars));
 end function;
 
 
@@ -70,6 +53,8 @@ if g eq 1 then
     return ReconstructCurveG1(P, K : Base := Base);
 elif g eq 2 then
     return ReconstructCurveG2(P, K : Base := Base);
+elif g eq 3 then
+    return ReconstructCurveG3(P, K : Base := Base);
 else
     error "Genus too large!";
 end if;
@@ -82,13 +67,11 @@ function ReconstructCurveGeometricG1(tau, K : Base := false)
 assert IsSmallPeriodMatrix(tau);
 jCC := jInvariant(tau[1,1]);
 if Base then
-    if Type(K) eq FldRat then
-        test, j := RationalReconstruction(jCC);
-    else
-        test, j := AlgebraizeElement(jCC, K);
-    end if;
+    test, j := AlgebraizeElement(jCC, K);
     if not test then
-        error "Failed to algebraize in given field";
+        vprint CurveRec : "";
+        vprint CurveRec : "Failed to algebraize";
+        return 0, 0, false;
     end if;
     hKL := CanonicalInclusionMap(K, K);
 else
@@ -99,7 +82,7 @@ E := EllipticCurveFromjInvariant(j);
 if Type(BaseRing(E)) eq FldRat then
     E := MinimalModel(E);
 end if;
-return E, hKL;
+return E, hKL, true;
 
 end function;
 
@@ -140,15 +123,12 @@ g4CC := 120 * (1/Pnew[1,1])^4 * ZetaFunction(RR, 4) * Eisenstein(4, Eltseq(Pnew)
 g6CC := 280 * (1/Pnew[1,1])^6 * ZetaFunction(RR, 6) * Eisenstein(6, Eltseq(Pnew));
 
 if Base then
-    if Type(K) eq FldRat then
-        test4, g4 := RationalReconstruction(g4CC);
-        test6, g6 := RationalReconstruction(g6CC);
-    else
-        testg4, g4 := AlgebraizeElement(g4CC, K);
-        testg6, g6 := AlgebraizeElement(g6CC, K);
-    end if;
+    testg4, g4 := AlgebraizeElement(g4CC, K);
+    testg6, g6 := AlgebraizeElement(g6CC, K);
     if not (testg4 and testg6) then
-        error "Failed to algebraize in given field";
+        vprint CurveRec : "";
+        vprint CurveRec : "Failed to algebraize";
+        return 0, 0, false;
     end if;
     L := K; hKL := CanonicalInclusionMap(K, L);
 else
@@ -165,13 +145,14 @@ Q := ChangeRing(PeriodMatrix([ fCC, hCC ], [ f, h ]), CC);
 /* The next line functions as an assertion */
 A := Matrix(CC, [[1]]);
 R := HomologyRepresentation(A, P, Q);
-return X, hKL;
+return X, hKL, true;
 
 end function;
 
 
 function ReconstructCurveGeometricG2(tau, K : Base := false)
 /* Alternative: implement variant of BILV */
+/* TODO: Add check of not being product of elliptic curves */
 
 assert IsSmallPeriodMatrix(tau);
 CC := BaseRing(tau);
@@ -231,18 +212,12 @@ fCC := &*[ RCC.1 - rat : rat in rats ];
 ICC := IgusaInvariants(fCC); W := [ 2, 4, 6, 8, 10 ];
 ICC := WPSNormalizeCC(W, ICC);
 if Base then
-    I := [ ];
-    for iCC in ICC do
-        if Type(K) eq FldRat then
-            test, i := RationalReconstruction(iCC);
-        else
-            test, i := AlgebraizeElement(iCC, K);
-        end if;
-        if not test then
-            error "Failed to algebraize in given field";
-        end if;
-        Append(~I, i);
-    end for;
+    test, I := AlgebraizeElements(ICC, K);
+    if not test then
+        vprint CurveRec : "";
+        vprint CurveRec : "Failed to algebraize";
+        return 0, 0, false;
+    end if;
     L := K; hKL := CanonicalInclusionMap(K, L);
 else
     L, I, hKL := NumberFieldExtra(ICC, K);
@@ -262,7 +237,7 @@ if Type(BaseRing(Y)) eq FldRat then
     Y := HyperellipticCurve(Polynomial(coeffs));
     Y := ReducedMinimalWeierstrassModel(Y);
 end if;
-return Y, hKL;
+return Y, hKL, true;
 
 end function;
 
@@ -270,6 +245,7 @@ end function;
 function ReconstructCurveG2(P, K : Base := false, Dom := [-5..5])
 // Reconstruct curve from period matrix P, returned over an extension of the
 // base field K.
+/* TODO: Add check of not being product of elliptic curves */
 
 /* Reduce small period matrix */
 P1 := Submatrix(P, 1,1, 2,2); P1i := P1^(-1);
@@ -374,18 +350,12 @@ fCC := lam^2*fCC; coeffsCC := Coefficients(fCC);
 coeffsCC := ChangeUniverse(coeffsCC, K`CC);
 
 if Base then
-    coeffs := [ ];
-    for coeffCC in coeffsCC do
-        if Type(K) eq FldRat then
-            test, coeff := RationalReconstruction(coeffCC);
-        else
-            test, coeff := AlgebraizeElement(coeffCC, K);
-        end if;
-        if not test then
-            error "Failed to algebraize in given field";
-        end if;
-        Append(~coeffs, coeff);
-    end for;
+    test, coeffs := AlgebraizeElements(coeffsCC, K);
+    if not test then
+        vprint CurveRec : "";
+        vprint CurveRec : "Failed to algebraize";
+        return 0, 0, false;
+    end if;
     L := K; hKL := CanonicalInclusionMap(K, L);
 else
     L, coeffs, hKL := NumberFieldExtra(coeffsCC, K);
@@ -398,7 +368,7 @@ Y := HyperellipticCurve(f);
 Q := ChangeRing(PeriodMatrix([ fCC ], [ f ]), CC);
 /* The next line functions as an assertion */
 R := HomologyRepresentation(IdentityMatrix(CC, 2), P, Q);
-return Y, hKL;
+return Y, hKL, true;
 
 end function;
 
@@ -412,71 +382,58 @@ assert IsSmallPeriodMatrix(taunew);
 thetas := ThetaValues(taunew);
 thetas_sq := [ theta^2 : theta in thetas ];
 
-vprint CurveRec, 2 : "";
-vprint CurveRec, 2: "Squares of theta values:";
-vprint CurveRec, 2: ChangeUniverse(thetas_sq, ComplexField(5));
-
 v0s := FindDelta(thetas_sq);
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2: "Number of non-zero even theta values:";
+vprint CurveRec, 2: #v0s;
+
 if #v0s eq 0 then
-    error "Uncomment relevant section of curve_reconstruction/reconstruction.m";
-    /*
     ICC := DixmierOhnoInvariantsFromThetas(thetas);
 
     if Base then
-        I := [ ];
-        for iCC in ICC do
-            if Type(K) eq FldRat then
-                test, i := RationalReconstruction(iCC);
-            else
-                test, i := AlgebraizeElement(iCC, K);
-            end if;
-            if not test then
-                error "Failed to algebraize in given field";
-            end if;
-            Append(~I, i);
-        end for;
+        test, I := AlgebraizeElements(ICC, K);
+        if not test then
+            vprint CurveRec : "";
+            vprint CurveRec : "Failed to algebraize";
+            return 0, 0, false;
+        end if;
         L := K; hKL := CanonicalInclusionMap(K, L);
 
     else
         L, I, hKL := NumberFieldExtra(ICC, K);
     end if;
-    Y := TernaryQuarticFromDixmierOhnoInvariants(I);
-    return PlaneCurve(Y), hKL;
-    */
+    f := TernaryQuarticFromDixmierOhnoInvariants(I);
+    return PlaneCurve(f), hKL, true;
 
 elif #v0s eq 1 then
     ICC := ShiodaInvariantsFromThetaSquares(thetas_sq);
 
     if Base then
-        I := [ ];
-        for iCC in ICC do
-            if Type(K) eq FldRat then
-                test, i := RationalReconstruction(iCC);
-            else
-                test, i := AlgebraizeElement(iCC, K);
-            end if;
-            if not test then
-                error "Failed to algebraize in given field";
-            end if;
-            Append(~I, i);
-        end for;
+        test, I := AlgebraizeElements(ICC, K);
+        if not test then
+            vprint CurveRec : "";
+            vprint CurveRec : "Failed to algebraize";
+            return 0, 0, false;
+        end if;
         L := K; hKL := CanonicalInclusionMap(K, L);
 
     else
         L, I, hKL := NumberFieldExtra(ICC, K);
     end if;
     Y := HyperellipticCurveFromShiodaInvariants(I);
-    return Y, hKL;
+    return Y, hKL, true;
 
 else
-    error "Too many even characteristics vanish", #v0s;
+    vprint CurveRec : "";
+    vprint CurveRec : "Too many even theta characteristics vanish";
+    return 0, 0, false;
 end if;
 
 end function;
 
 
 intrinsic AlgebraizedInvariants(tau::AlgMatElt, K::Fld) -> .
-{Returns invariants algebraized over given base.}
+{Returns invariants algebraized in given base.}
 
 /* Calculate thetas and see in which case we are */
 assert IsSmallPeriodMatrix(tau);
@@ -499,19 +456,60 @@ if #v0s eq 0 then
 else
     ICC := ShiodaInvariantsFromThetaSquares(thetas_sq);
 end if;
-
-I := [ ];
-for iCC in ICC do
-    if Type(K) eq FldRat then
-        test, i := RationalReconstruction(iCC);
-    else
-        test, i := AlgebraizeElement(iCC, K);
-    end if;
-    if not test then
-        return false, 0;
-    end if;
-    Append(~I, i);
-end for;
-return true, I;
+return AlgebraizeElements(ICC, K);
 
 end intrinsic;
+
+
+function ReconstructCurveG3(P, K : Base := Base)
+/* Only for plane quartic curves currently, hyperelliptic curves soon to follow */
+
+/* Reduce small period matrix */
+P1 := Submatrix(P, 1,1, 3,3); P1i := P1^(-1);
+P2 := Submatrix(P, 1,4, 3,3);
+tau := P1i*P2;
+assert IsSmallPeriodMatrix(tau);
+
+Y, hKL, test := ReconstructCurveGeometricG3(tau, K : Base := Base);
+g := DefiningPolynomial(Y);
+Q := PeriodMatrix(Y);
+if not test then
+    return 0, 0, false;
+end if;
+if Type(Y) eq CrvHyp then
+    vprint CurveRec : "";
+    vprint CurveRec : "Arithmetic reconstruction not yet possible for hyperelliptic curves";
+    return 0, 0, false;
+end if;
+
+isos := IsomorphismsCC(P, Q);
+T := isos[1][1];
+gCC := EmbedPolynomialExtra(g);
+fCC := TransformForm(gCC, T);
+CC := BaseRing(Parent(fCC));
+coeffs := [ c : c in Coefficients(fCC) | Abs(c) gt CC`epscomp ];
+min, ind := Minimum([ Abs(c) : c in coeffs ]);
+fCC /:= coeffs[1];
+
+monsCC := Monomials(fCC);
+coeffsCC := [ MonomialCoefficient(fCC, monCC) : monCC in monsCC ];
+exps := [ Exponents(monCC) : monCC in monsCC ];
+
+if Base then
+    test, coeffs := AlgebraizeElements(coeffsCC, K);
+    if not test then
+        vprint CurveRec : "";
+        vprint CurveRec : "Failed to algebraize";
+        return 0, 0, false;
+    end if;
+    L := K; hKL := CanonicalInclusionMap(K, L);
+else
+    L, coeffs, hKL := NumberFieldExtra(coeffsCC, K);
+end if;
+
+R := PolynomialRing(L, 3);
+F0 := &+[ coeffs[i]*Monomial(R, exps[i]) : i in [1..#coeffs] ];
+X0 := PlaneCurve(F0);
+return X0, hKL, true;
+
+end function;

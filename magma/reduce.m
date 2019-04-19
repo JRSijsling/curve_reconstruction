@@ -258,7 +258,13 @@ N0 := Matrix(Integers(), [
 [  0,  0,  0,  0,  1,  0],
 [  0,  0,  0,  0,  0,  1]
 ]);
+counter := 0;
 while true do
+    counter +:= 1;
+    if counter mod 10^3 eq 0 then
+        vprint CurveRec : "Counter:", counter;
+        break;
+    end if;
     tau := LLLReduceMatrixG3(tau);
     tau := IntegerReduceMatrixG3(tau);
     if Abs(tau[1,1]) gt 0.99 then

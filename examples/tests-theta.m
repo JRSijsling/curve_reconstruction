@@ -13,7 +13,7 @@ import "../fastthetaconstantsgenus3.m": NaiveThetaConstantsGenus3, CalculThetas;
 
 
 prec := 500;
-CC := ComplexField(prec);
+CC := ComplexFieldExtra(prec);
 R<x> := PolynomialRing(CC);
 
 //Define curve

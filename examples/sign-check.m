@@ -8,7 +8,7 @@
 
 SetVerbose("CurveRec", 2);
 prec := 200;
-CC := ComplexField(prec);
+CC := ComplexFieldExtra(prec);
 R<x> := PolynomialRing(CC);
 
 print "";
