@@ -7,7 +7,7 @@
  */
 
 SetVerbose("EndoFind", 1);
-SetVerbose("CurveRec", 2);
+SetVerbose("CurveRec", 1);
 
 prec := 500;
 F := RationalsExtra(prec);

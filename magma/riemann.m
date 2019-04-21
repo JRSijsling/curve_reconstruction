@@ -57,6 +57,9 @@ intrinsic DixmierOhnoInvariants(X::Crv) -> .
 if not Type(X) eq CrvPln then
     error "Input must be a plane curve";
 end if;
+if not Degree(DefiningPolynomial(X)) eq 4 then
+    error "Input must be a quartic curve";
+end if;
 return DixmierOhnoInvariants(DefiningPolynomial(X));
 
 end intrinsic;

@@ -92,10 +92,9 @@ function ReconstructCurveG1(P, K : Base := false)
 // base field K.
 
 /* Check small period matrix */
-P1 := Submatrix(P, 1,1, 1,1); P1i := P1^(-1);
-P2 := Submatrix(P, 1,2, 1,1);
-tau := P1i*P2; CC := BaseRing(Parent(tau));
+tau := SmallPeriodMatrix(P);
 assert IsSmallPeriodMatrix(tau);
+CC := BaseRing(Parent(tau));
 
 /* Reduce small period matrix */
 taunew, gamma := ReduceSmallPeriodMatrix(tau);
@@ -142,9 +141,14 @@ X := HyperellipticCurve(f);
 R<x> := PolynomialRing(CC);
 fCC := (4*x^3 - g4CC*x - g6CC)/4; hCC := R ! 0;
 Q := ChangeRing(PeriodMatrix([ fCC, hCC ], [ f, h ]), CC);
+
 /* The next line functions as an assertion */
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2 : "Check existence of homomorphism:";
 A := Matrix(CC, [[1]]);
 R := HomologyRepresentation(A, P, Q);
+vprint CurveRec, 2 : "done.";
+
 return X, hKL, true;
 
 end function;
@@ -235,7 +239,9 @@ if Type(BaseRing(Y)) eq FldRat then
     e := GCD(coeffs);
     coeffs := [ coeff div e : coeff in coeffs ];
     Y := HyperellipticCurve(Polynomial(coeffs));
-    Y := ReducedMinimalWeierstrassModel(Y);
+    if Type(K) eq FldRat then
+        Y := ReducedMinimalWeierstrassModel(Y);
+    end if;
 end if;
 return Y, hKL, true;
 
@@ -248,10 +254,9 @@ function ReconstructCurveG2(P, K : Base := false, Dom := [-5..5])
 /* TODO: Add check of not being product of elliptic curves */
 
 /* Reduce small period matrix */
-P1 := Submatrix(P, 1,1, 2,2); P1i := P1^(-1);
-P2 := Submatrix(P, 1,3, 2,2);
-tau := P1i*P2; CC := BaseRing(Parent(tau));
+tau := SmallPeriodMatrix(P);
 assert IsSmallPeriodMatrix(tau);
+CC := BaseRing(Parent(tau));
 
 /* Reduce small period matrix */
 taunew, gamma := ReduceSmallPeriodMatrix(tau);
@@ -367,7 +372,11 @@ Y := HyperellipticCurve(f);
 
 Q := ChangeRing(PeriodMatrix([ fCC ], [ f ]), CC);
 /* The next line functions as an assertion */
-R := HomologyRepresentation(IdentityMatrix(CC, 2), P, Q);
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2 : "Check existence of homomorphism:";
+A := IdentityMatrix(CC, 2);
+R := HomologyRepresentation(A, P, Q);
+vprint CurveRec, 2 : "done.";
 return Y, hKL, true;
 
 end function;
@@ -465,24 +474,35 @@ function ReconstructCurveG3(P, K : Base := Base)
 /* Only for plane quartic curves currently, hyperelliptic curves soon to follow */
 
 /* Reduce small period matrix */
-P1 := Submatrix(P, 1,1, 3,3); P1i := P1^(-1);
-P2 := Submatrix(P, 1,4, 3,3);
-tau := P1i*P2;
+
+tau := SmallPeriodMatrix(P);
 assert IsSmallPeriodMatrix(tau);
+CC := BaseRing(Parent(tau));
 
 Y, hKL, test := ReconstructCurveGeometricG3(tau, K : Base := Base);
-g := DefiningPolynomial(Y);
-Q := PeriodMatrix(Y);
 if not test then
     return 0, 0, false;
 end if;
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2 : "Geometric reconstruction:";
+vprint CurveRec, 2 : Y;
+
+g := DefiningPolynomial(Y);
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2 : "Determining period matrix of geometric reconstruction:";
+Q := PeriodMatrix(Y);
 if Type(Y) eq CrvHyp then
     vprint CurveRec : "";
     vprint CurveRec : "Arithmetic reconstruction not yet possible for hyperelliptic curves";
     return 0, 0, false;
 end if;
+vprint CurveRec, 2 : "done determining period matrix of geometric reconstruction.";
 
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2 : "Determining isomorphisms with original period matrix:";
 isos := IsomorphismsCC(P, Q);
+vprint CurveRec, 2 : "done.";
+
 T := isos[1][1];
 gCC := EmbedPolynomialExtra(g);
 fCC := TransformForm(gCC, T);

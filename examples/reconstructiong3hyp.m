@@ -6,7 +6,7 @@
  *  See LICENSE.txt for license details.
  */
 
-SetVerbose("EndoFind", 3);
+SetVerbose("EndoFind", 1);
 
 prec := 300;
 F := RationalsExtra(prec);

@@ -7,8 +7,8 @@
  */
 
 
-import "../precomp.m": PrecomputedGamma, GammaFor0;
-import "../rosenhain.m": EtaFunction0, EtaFunction, EtaValue, UFromEtaFunction, VectorFromIndex, IndexFromVector, IsEvenVector, LeftActionChar, ThetaSquares, FindDelta;
+import "../magma/precomp.m": PrecomputedGamma, GammaFor0;
+import "../magma/rosenhain.m": EtaFunction0, EtaFunction, EtaValue, UFromEtaFunction, VectorFromIndex, IndexFromVector, IsEvenVector, LeftActionChar, ThetaSquares, FindDelta;
 
 
 function StandardSymplecticMatrix(g)

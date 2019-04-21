@@ -31,6 +31,7 @@ print "Geometric reconstruction over base:";
 X := ReconstructCurveGeometric(tau, F : Base := true);
 print X;
 
+print "";
 print "Arithmetic reconstruction over base:";
 X := ReconstructCurve(P, F : Base := true);
 print X;

@@ -7,8 +7,8 @@
  */
 
 
-import "../precomp.m": PrecomputedGamma, GammaFor0;
-import "../rosenhain.m": EtaFunction0, EtaFunction, EtaValue, UFromEtaFunction, VectorFromIndex, IndexFromVector, IsEvenVector, LeftActionChar, FindDelta;
+import "../magma/precomp.m": PrecomputedGamma, GammaFor0;
+import "../magma/rosenhain.m": EtaFunction0, EtaFunction, EtaValue, UFromEtaFunction, VectorFromIndex, IndexFromVector, IsEvenVector, LeftActionChar, FindDelta;
 
 
 prec := 200;
@@ -22,6 +22,7 @@ shioda := WPSNormalize(W, shioda);
 X := SE_Curve(f, 2 : Prec := prec + 20);
 P := ChangeRing(X`BigPeriodMatrix, CC);
 
+print "";
 print "Finding transformation:";
 while true do
     T := RandomSymplecticMatrix(3, 1);
@@ -45,9 +46,11 @@ P1 := Submatrix(P, 1,1, 3,3); P2 := Submatrix(P, 1,4, 3,3);
 tau := P1^(-1)*P2;
 tau := ReduceSmallPeriodMatrix(tau);
 
+print "";
 print "Check true:";
 print IsSmallPeriodMatrix(tau);
 
+print "";
 print "In case of no further output everything is A-OK!";
 
 /* Test extended property of U in Theorem 4.2 */

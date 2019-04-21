@@ -40,9 +40,9 @@ intrinsic IsSmallPeriodMatrix(tau::.) -> BoolElt
 Imtau := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(tau) ]);
 test := IsSymmetricImproved(tau) and IsPositiveDefiniteImproved(Imtau);
 if not test then
-    vprint CurveRec : "";
-    vprint CurveRec : "Not a small period matrix:";
-    vprint CurveRec : tau;
+    vprint CurveRec, 2  : "";
+    vprint CurveRec, 2 : "Not a small period matrix:";
+    vprint CurveRec, 2 : tau;
 end if;
 return test;
 end intrinsic;
@@ -51,8 +51,9 @@ end intrinsic;
 intrinsic SmallPeriodMatrix(P::ModMatFldElt) -> .
 {Returns small period matrix associated to P.}
 g := #Rows(P);
-P1 := Submatrix(P, 1,1,   g,g); P1i := P1^(-1);
+P1 := Submatrix(P, 1,1,   g,g);
 P2 := Submatrix(P, 1,g+1, g,g);
+P1i := P1^(-1);
 tau := P1i*P2;
 return tau;
 end intrinsic;
@@ -208,19 +209,29 @@ counter := 0;
 repeat
     counter +:= 1;
     if counter mod 10^3 eq 0 then
-        vprint CurveRec : "Counter:", counter;
+        vprint CurveRec : "";
+        vprint CurveRec : "Counter for period matrix reduction is high:", counter;
         break;
     end if;
 
+    vprint CurveRec, 2 : "";
+    vprint CurveRec, 2 : "Minkowski reduction...";
     taured, gamma := MinkowskiReductionG2CC(taured);
     U := BlockMatrix([ [ gamma, 0 ], [ 0, Transpose(gamma^(-1)) ] ]);
     T := U*T;
+    vprint CurveRec, 2 : "done.";
 
+    vprint CurveRec, 2 : "";
+    vprint CurveRec, 2 : "Integral reduction...";
     taured, gamma := IntegerReduceMatrixG2(taured);
     U := BlockMatrix([ [ 1, gamma ], [ 0, 1 ] ]);
     T := U*T;
+    vprint CurveRec, 2 : "done.";
 
+    vprint CurveRec, 2 : "";
+    vprint CurveRec, 2 : "Gottschling reduction...";
     taured, U, done := GottschlingReduce(taured);
+    vprint CurveRec, 2 : "done.";
     T := U*T;
 until done;
 
@@ -262,11 +273,21 @@ counter := 0;
 while true do
     counter +:= 1;
     if counter mod 10^3 eq 0 then
-        vprint CurveRec : "Counter:", counter;
+        vprint CurveRec : "";
+        vprint CurveRec : "Counter for period matrix reduction is high:", counter;
         break;
     end if;
+
+    vprint CurveRec, 2 : "";
+    vprint CurveRec, 2 : "LLL reduction...";
     tau := LLLReduceMatrixG3(tau);
+    vprint CurveRec, 2 : "done";
+
+    vprint CurveRec, 2 : "";
+    vprint CurveRec, 2 : "LLL reduction...";
     tau := IntegerReduceMatrixG3(tau);
+    vprint CurveRec, 2 : "done";
+
     if Abs(tau[1,1]) gt 0.99 then
         return tau;
     end if;

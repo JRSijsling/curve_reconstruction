@@ -58,5 +58,3 @@ print v0;
 print "";
 print "Rosenhain invariants:";
 print [ ComplexField(5) ! rosen : rosen in rosens ];
-
-exit;

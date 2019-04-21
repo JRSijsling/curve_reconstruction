@@ -6,7 +6,8 @@
  *  See LICENSE.txt for license details.
  */
 
-SetVerbose("CurveRec", 2);
+SetVerbose("CurveRec", 1);
+
 prec := 200;
 CC := ComplexFieldExtra(prec);
 R<x> := PolynomialRing(CC);

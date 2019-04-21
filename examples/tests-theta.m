@@ -7,9 +7,9 @@
  */
 
 
-import "../precomp.m": PrecomputedGamma, GammaFor0;
-import "../rosenhain.m": EtaFunction0, EtaFunction, EtaValue, UFromEtaFunction, VectorFromIndex, IndexFromVector, IsEvenVector, LeftActionChar, ThetaSquares, FindDelta;
-import "../fastthetaconstantsgenus3.m": NaiveThetaConstantsGenus3, CalculThetas;
+import "../magma/precomp.m": PrecomputedGamma, GammaFor0;
+import "../magma/rosenhain.m": EtaFunction0, EtaFunction, EtaValue, UFromEtaFunction, VectorFromIndex, IndexFromVector, IsEvenVector, LeftActionChar, ThetaSquares, FindDelta;
+import "../magma/fastthetaconstantsgenus3.m": NaiveThetaConstantsGenus3, CalculThetas;
 
 
 prec := 500;
@@ -23,6 +23,7 @@ shioda := WPSNormalize(W, shioda);
 X := SE_Curve(f, 2 : Prec := prec + 20);
 P := ChangeRing(X`BigPeriodMatrix, CC);
 
+print "";
 print "Finding transformation:";
 while true do
     T := RandomSymplecticMatrix(3, 1);
@@ -37,10 +38,14 @@ print "done";
 P1 := Submatrix(P, 1,1, 3,3); P2 := Submatrix(P, 1,4, 3,3);
 tau := P1^(-1)*P2;
 tau := ReduceSmallPeriodMatrix(tau);
-print "Reduce period matrix:";
+print "";
+print "Reduced period matrix:";
 print ChangeRing(tau, ComplexField(5));
 
+print "";
 print "NaiveThetaConstantsGenus3:";
 time funds := NaiveThetaConstantsGenus3(tau/2, false);
+
+print "";
 print "CalculThetas:";
 time funds := CalculThetas(tau/2);
