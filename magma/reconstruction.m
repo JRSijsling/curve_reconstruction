@@ -457,6 +457,8 @@ vprint CurveRec, 2: "Number of non-zero even theta values:";
 vprint CurveRec, 2: #v0s;
 
 if #v0s gt 1 then
+    vprint CurveRec : "";
+    vprint CurveRec : "At least two vanishing even characteristics";
     return false, 0;
 end if;
 
@@ -465,7 +467,15 @@ if #v0s eq 0 then
 else
     ICC := ShiodaInvariantsFromThetaSquares(thetas_sq);
 end if;
-return AlgebraizeElements(ICC, K);
+test, I := AlgebraizeElements(ICC, K);
+
+vprint CurveRec : "";
+if test then
+    vprint CurveRec : "Successfully algebraized invariants";
+else
+    vprint CurveRec : "Failed to algebraize invariants";
+end if;
+return test, I;
 
 end intrinsic;
 
