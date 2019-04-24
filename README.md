@@ -1,46 +1,61 @@
 Description
------------
+--
 
-This repository contains Magma code for reconstructing hyperelliptic curves of genus up to 3 from their period matrices, both geometrically and arithmetically. With some extra work, plane curves and hyperelliptic curves of arbitrary genus should be feasible. However, the repository is not being actively developed in that direction yet.
+This repository contains Magma code for reconstructing hyperelliptic curves of genus up to 3 from their period matrices, both geometrically and arithmetically. With some extra work, hyperelliptic curves of arbitrary genus should be feasible. However, the repository is not being actively developed in that direction yet.
 
 Prerequisites
--------------
+--
 
-An installation of Magma and the dependency [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms).
+An installation of Magma and the dependencies [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms) and [`JRSijsling/quartic_reconstruction`](https://github.com/JRSijsling/quartic_reconstruction). 
+
+Upcoming installations with Magma will include code by Christian Neurohr that will enable the computation of period matrices of plane curves, which will make possible the arithmetic reconstruction of these curves from their period matrices when following the steps described in [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms). Geometric reconstruction already works as is; without Neurohr's code, the arithmetic version will return an error.
 
 Installation
-------------
+--
 
-The subdirectory `curve_reconstruction/magma/` includes code that can be run purely within Magma. You can load all the Magma specific files by attaching the ``curve_reconstruction/magma/spec`` file with ``AttachSpec``. For example, if you start your session of Magma inside the git directory, you can do this by typing
-```
-AttachSpec("curve_reconstruction/magma/spec");
-```
-To make this independent of the directory in which you find yourself, you may prefer to indicate the relative path, like
+You can enable the functionality of this package in Magma by attaching the `curve_reconstruction/magma/spec` file with `AttachSpec`. To make this independent of the directory in which you find yourself, and to active this on startup by default, you may want to indicate the relative path in your `~/.magmarc` file, by adding the line
 ```
 AttachSpec("~/Programs/curve_reconstruction/magma/spec");
 ```
 
+Usage
+--
+
+Examples are given in the directory `examples/`.
+
+Verbose comments are enabled by
+```
+SetVerbose("CurveRec", n);
+```
+where and `n` is either `1` or `2`. A higher value gives more comments.
+
 Credits
--------
+--
 
 This implementation is based on the following works. When using this package, please be aware of the work that you are indirectly applying and please cite it.
 
-For geometric reconstruction in genus 3 (also see their own `SageMath` implementation at [`christellevincent/genus3`](https://github.com/christellevincent/genus3):
+For geometric reconstruction in genus 3 (also see their own SageMath implementation at [`christellevincent/genus3`](https://github.com/christellevincent/genus3):
 
-Balakrishnan, Jennifer; Ionica, Sorina; Lauter, Kristin; Vincent, Christelle:  
-*Constructing genus-3 hyperelliptic Jacobians with CM.* (English summary)  
+Jennifer Balakrishnan, Sorina Ionica, Kristin Lauter, and Christelle Vincent  
+*Constructing genus-3 hyperelliptic Jacobians with CM* (English summary)  
 LMS J. Comput. Math. 19 (2016), suppl. A, pp. 283-–300.
 
 For arithmetic reconstruction in genus 2:
 
-Guàrdia, Jordi:  
-*Jacobian Nullwerte and algebraic equations.*  
+Jordi Guàrdia  
+*Jacobian Nullwerte and algebraic equations*  
 Journal of Algebra 253 (2002) 112–132.
 
 For the fast computation of theta constants needed when geometrically reconstructing in genus 2 or 3:
 
-Labrande, Hugo; Thomé, Emmanuel:   
-*Computing theta functions in quasi-linear time in genus 2 and above.*  
+Hugo Labrande and Emmanuel Thomé  
+*Computing theta functions in quasi-linear time in genus 2 and above*  
 LMS J. Comput. Math. 19 (2016), suppl. A, pp. 163–-177.
+
+For the (upcoming!) calculation of period matrices of plane quartic curves used for arithmetic reconstruction:
+
+Christian Neurohr  
+*Efficient integration on Riemann surfaces & applications*  
+Ph.D. thesis, Carl-von-Ossietzky-Universität Oldenburg (2018)
 
 Finally, this work uses the reduction of genus 2 small period matrices as implemented by Marco Streng and his collaborators in [`mstreng/recip`](https://github.com/mstreng/recip).
