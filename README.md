@@ -6,7 +6,7 @@ This repository contains Magma code for reconstructing hyperelliptic curves of g
 Prerequisites
 --
 
-An installation of Magma and the dependencies [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms) and [`JRSijsling/quartic_reconstruction`](https://github.com/JRSijsling/quartic_reconstruction). 
+An installation of Magma and the dependencies [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms), [`JRSijsling/quartic_reconstruction`](https://github.com/JRSijsling/quartic_reconstruction), and [`JRSijsling/quartic_isomorphisms`](https://github.com/JRSijsling/quartic_isomorphisms).
 
 Upcoming installations with Magma will include code by Christian Neurohr that will enable the computation of period matrices of plane curves, which will make possible the arithmetic reconstruction of these curves from their period matrices when following the steps described in [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms). Geometric reconstruction already works as is; without Neurohr's code, the arithmetic version will return an error.
 

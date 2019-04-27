@@ -411,7 +411,10 @@ if #v0s eq 0 then
     else
         L, I, hKL := NumberFieldExtra(ICC, K);
     end if;
-    f := TernaryQuarticFromDixmierOhnoInvariants(I);
+    f, aut := TernaryQuarticFromDixmierOhnoInvariants(I);
+    if #aut eq 0 then
+        f := MinimizeC2Quartic(f);
+    end if;
     return PlaneCurve(f), hKL, true;
 
 elif #v0s eq 1 then
