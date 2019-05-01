@@ -129,6 +129,7 @@ end intrinsic;
 
 intrinsic ThetaValues(tau::AlgMatElt : Labrande := true) -> SeqEnum
 {Calculate theta null values.}
+CC := BaseRing(tau);
 if Labrande then
     thetas_sq := ThetaSquares(tau);
     thetas := [ ];
@@ -137,18 +138,22 @@ if Labrande then
     tausmall := ChangeRing(tau, ComplexField(30));
     for i in [1..2^(2*g)] do
         v := VectorFromIndex(g, i);
-        thetasmall := Theta(v, M0, tausmall);
-        thetasqrt := Sqrt(thetas_sq[i]);
-        /* TODO: Ditch fixed precision */
-        if Abs(thetasqrt - thetasmall) le 10^(-10) then
-            Append(~thetas, thetasqrt);
-        elif Abs(thetasqrt + thetasmall) le 10^(-10) then
-            Append(~thetas, -thetasqrt);
+        if Abs(thetas_sq[i]) lt CC`epscomp then
+            Append(~thetas, 0);
         else
-            error "No suitable root found";
+            thetasmall := Theta(v, M0, tausmall);
+            thetasqrt := Sqrt(thetas_sq[i]);
+            /* TODO: Ditch fixed precision */
+            if Abs(thetasqrt - thetasmall) le 10^(-10) then
+                Append(~thetas, thetasqrt);
+            elif Abs(thetasqrt + thetasmall) le 10^(-10) then
+                Append(~thetas, -thetasqrt);
+            else
+                error "No suitable root found";
+            end if;
         end if;
     end for;
-    return thetas;
+    return thetas, thetas_sq;
 end if;
 g := #Rows(tau);
 M0 := ZeroMatrix(Rationals(), g, 1);

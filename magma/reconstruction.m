@@ -388,8 +388,7 @@ function ReconstructCurveGeometricG3(tau, K : Base := Base)
 assert IsSmallPeriodMatrix(tau);
 taunew := ReduceSmallPeriodMatrix(tau);
 assert IsSmallPeriodMatrix(taunew);
-thetas := ThetaValues(taunew);
-thetas_sq := [ theta^2 : theta in thetas ];
+thetas, thetas_sq := ThetaValues(taunew);
 
 v0s := FindDelta(thetas_sq);
 vprint CurveRec, 2 : "";
@@ -451,8 +450,7 @@ intrinsic AlgebraizedInvariants(tau::AlgMatElt, K::Fld) -> .
 assert IsSmallPeriodMatrix(tau);
 taunew := ReduceSmallPeriodMatrix(tau);
 assert IsSmallPeriodMatrix(taunew);
-thetas := ThetaValues(taunew);
-thetas_sq := [ theta^2 : theta in thetas ];
+thetas, thetas_sq := ThetaValues(taunew);
 
 v0s := FindDelta(thetas_sq);
 vprint CurveRec, 2 : "";
