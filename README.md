@@ -58,4 +58,10 @@ Christian Neurohr
 *Efficient integration on Riemann surfaces & applications*  
 Ph.D. thesis, Carl-von-Ossietzky-Universität Oldenburg (2018)
 
+In more ad-hoc form, some of the methods in this package were used in
+
+Pinar Kılıçer, Hugo Labrande, Reynald Lercier, Christophe Ritzenthaler, Jeroen Sijsling, Marco Streng  
+*Plane quartics over QQ with complex multiplication*  
+Acta Arith. 185 (2018), no. 2, 127-156
+
 Finally, this work uses the reduction of genus 2 small period matrices as implemented by Marco Streng and his collaborators in [`mstreng/recip`](https://github.com/mstreng/recip).
