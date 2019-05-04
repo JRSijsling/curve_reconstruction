@@ -121,13 +121,14 @@ if Labrande and g in [2,3] then
     elif g eq 3 then
         FindThetasSq := ThetaSquaresLabrandeGenus3;
     end if;
-    CC0 := BaseRing(tau); prec := Precision(CC0); RR0 := RealField(CC0);
-    eps := RR0 ! (10^(-9.5 * (prec div 10)));
+    CC0 := BaseRing(tau); prec0 := Precision(CC0); RR0 := RealField(CC0);
+    eps := RR0 ! (10^(-9.5 * (prec0 div 10)));
 
+    prec := prec0;
     repeat
         CC := ComplexFieldExtra(prec);
         thetas_sq := FindThetasSq(tau);
-        prec +:= 100;
+        prec +:= (prec0 div 5);
         CCnew := ComplexFieldExtra(prec);
         tau := ChangeRing(tau, CCnew);
         thetas_sqnew := FindThetasSq(tau);
