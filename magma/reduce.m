@@ -284,7 +284,7 @@ while true do
     vprint CurveRec, 2 : "done";
 
     vprint CurveRec, 2 : "";
-    vprint CurveRec, 2 : "LLL reduction...";
+    vprint CurveRec, 2 : "Integer reduction...";
     tau := IntegerReduceMatrixG3(tau);
     vprint CurveRec, 2 : "done";
 

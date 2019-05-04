@@ -1,5 +1,5 @@
-SetVerbose("CurveRec", 0);
-SetVerbose("EndoFind", 0);
+SetVerbose("CurveRec", 2);
+SetVerbose("EndoFind", 3);
 
 prec := 300;
 F := RationalsExtra(prec);
@@ -19,6 +19,14 @@ thetas_sq0 := thetas_sq;
 prec := 400;
 F := RationalsExtra(prec);
 CC := F`CC;
+
+/*
+taunew := ChangeRing(taunew, CC);
+thetas, thetas_sq := ThetaValues(taunew);
+
+taunew0 := taunew;
+thetas_sq0 := thetas_sq;
+*/
 
 f := x^7 + x + 1;
 X := HyperellipticCurve(f);

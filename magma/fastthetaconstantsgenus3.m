@@ -626,7 +626,8 @@ function DiffFiniesOneStep(b, t,  tableOfSigns)
   // a is, as always, of size 4, but the first element is 1
   // Give approximations of the quotients (6 of them + 2 ones) with precision p and get an approximation with precision 2p
   prec := Precision(Parent(b[1][1]));
-  CC := ComplexField(2*prec);
+  //CC := ComplexField(2*prec);
+  CC := Parent(b[1][1]);
 
   newb := [ CC!b[i][1] : i in [1..#Rows(b)]];
   myBofSize7 := [ newb[i]/newb[1] : i in [2..#newb]];
@@ -785,6 +786,36 @@ for i:= 0 to 10 do
 end for;
 
 */
+
+
+function ThetaSquaresLabrandeGenus3Experiment(tau)
+
+print ChangeRing(tau, ComplexField(5));
+/* First computation of theta constants of tau */
+funds := NaiveThetaConstantsGenus3(tau/2, false);
+
+/* Signs tables and some refinements */
+tableOfSigns := ComputeTableOfSigns(tau/2);
+i := 0;
+while true do
+    /* Keep refining and inspect */
+    print i;
+    quots := Matrix(8,1, [ (funds[i]/funds[1])^2 : i in [1..8] ]);
+    print ChangeRing(quots, ComplexField(5));
+    quots := DiffFiniesOneStep(quots, tau/2, tableOfSigns);
+    print ChangeRing(quots, ComplexField(5));
+    theta000 := AGMPrime(quots, tau/2, tableOfSigns[1]);
+    funds := [ Sqrt(quots[i][1]/theta000)*tableOfSigns[1][i] : i in [1..8]];
+    print ChangeUniverse(funds, ComplexField(5));
+    i +:= 1;
+end while;
+
+/* Duplicate and get answers */
+thetas_sq := AllDuplication(funds);
+thetas_sq_new := thetas_sq cat [ thetas_sq[1] ];
+thetas_sq := thetas_sq_new[2..65];
+return thetas_sq;
+end function;
 
 
 function ThetaSquaresLabrandeGenus3(tau)

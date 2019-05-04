@@ -6,7 +6,8 @@
  *  See LICENSE.txt for license details.
  */
 
-SetVerbose("EndoFind", 1);
+SetVerbose("CurveRec", 2);
+SetVerbose("EndoFind", 3);
 
 prec := 300;
 F := RationalsExtra(prec);
@@ -25,7 +26,7 @@ P1 := Submatrix(P, 1,1, 3,3); P1i := P1^(-1);
 P2 := Submatrix(P, 1,4, 3,3);
 tau := P1i*P2;
 
-Y := ReconstructCurveGeometric(tau, F : Base := true);
+Y := ReconstructCurveGeometric(tau, F : Base := false);
 T, W := ShiodaInvariants(Y);
 print "";
 print "Geometric reconstruction over base:";

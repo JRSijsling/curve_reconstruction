@@ -115,12 +115,32 @@ end function;
 intrinsic ThetaSquares(tau::AlgMatElt : Labrande := true) -> SeqEnum
 {Calculate theta null values.}
 g := #Rows(tau);
-if g eq 2 and Labrande then
-    return ThetaSquaresLabrandeGenus2(tau);
+if Labrande and g in [2,3] then
+    if g eq 2 then
+        FindThetasSq := ThetaSquaresLabrandeGenus2;
+    elif g eq 3 then
+        FindThetasSq := ThetaSquaresLabrandeGenus3;
+    end if;
+    CC0 := BaseRing(tau); prec := Precision(CC0); RR0 := RealField(CC0);
+    eps := RR0 ! (10^(-9.5 * (prec div 10)));
+
+    repeat
+        CC := ComplexFieldExtra(prec);
+        thetas_sq := FindThetasSq(tau);
+        prec +:= 100;
+        CCnew := ComplexFieldExtra(prec);
+        tau := ChangeRing(tau, CCnew);
+        thetas_sqnew := FindThetasSq(tau);
+        dif := Maximum([ Abs(thetas_sq[i] - thetas_sqnew[i]) : i in [1..#thetas_sq] ]);
+        /*
+        vprint CurveRec, 2 : "";
+        vprint CurveRec, 2 : "Precision reached while refining thetas:";
+        vprint CurveRec, 2 : dif;
+        */
+    until dif lt eps;
+    return ChangeUniverse(thetas_sqnew, CC0);
 end if;
-if g eq 3 and Labrande then
-    return ThetaSquaresLabrandeGenus3(tau);
-end if;
+
 g := #Rows(tau);
 M0 := ZeroMatrix(Rationals(), g, 1);
 return [ Theta(VectorFromIndex(g, i), M0, tau)^2 : i in [1..2^(2*g)] ];
