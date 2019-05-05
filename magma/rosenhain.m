@@ -133,11 +133,10 @@ if Labrande and g in [2,3] then
         tau := ChangeRing(tau, CCnew);
         thetas_sqnew := FindThetasSq(tau);
         dif := Maximum([ Abs(thetas_sq[i] - thetas_sqnew[i]) : i in [1..#thetas_sq] ]);
-        /*
+
         vprint CurveRec, 2 : "";
         vprint CurveRec, 2 : "Precision reached while refining thetas:";
-        vprint CurveRec, 2 : dif;
-        */
+        vprint CurveRec, 2 : RealField(5) ! dif;
     until dif lt eps;
     return ChangeUniverse(thetas_sqnew, CC0);
 end if;
