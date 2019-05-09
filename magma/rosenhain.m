@@ -241,6 +241,7 @@ end function;
 
 intrinsic RosenhainInvariantsBILV(tau::.) -> SeqEnum, .
 {Calculates the Rosenhain invariants of the small period matrix tau.}
+tau := ReduceSmallPeriodMatrix(tau);
 thetas_sq := ThetaSquares(tau); v0s := FindDelta(thetas_sq);
 if #v0s ne 1 then
     error "Not right number of even zero characteristics:", v0s;
