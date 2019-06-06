@@ -474,7 +474,6 @@ if #v0s eq 0 then
 else
     ICC := ShiodaInvariantsFromThetaSquares(thetas_sq);
 end if;
-print ICC;
 test, I := AlgebraizeElements(ICC, K);
 
 vprint CurveRec : "";
