@@ -8,8 +8,6 @@ Prerequisites
 
 An installation of Magma and the dependencies [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms), [`JRSijsling/quartic_reconstruction`](https://github.com/JRSijsling/quartic_reconstruction), and [`JRSijsling/quartic_isomorphisms`](https://github.com/JRSijsling/quartic_isomorphisms).
 
-Upcoming installations with Magma will include code by Christian Neurohr that will enable the computation of period matrices of plane curves, which will make possible the arithmetic reconstruction of these curves from their period matrices when following the steps described in [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms). Geometric reconstruction already works as is; without Neurohr's code, the arithmetic version will return an error.
-
 Installation
 --
 
@@ -52,7 +50,7 @@ Hugo Labrande and Emmanuel Thomé
 *Computing theta functions in quasi-linear time in genus 2 and above*  
 LMS J. Comput. Math. 19 (2016), suppl. A, pp. 163–-177.
 
-For the (upcoming!) calculation of period matrices of plane quartic curves used for arithmetic reconstruction:
+For the calculation of period matrices of plane quartic curves used for arithmetic reconstruction:
 
 Christian Neurohr  
 *Efficient integration on Riemann surfaces & applications*  
