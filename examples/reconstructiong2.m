@@ -41,6 +41,13 @@ P1 := Submatrix(P, 1,1, 2,2); P1i := P1^(-1);
 P2 := Submatrix(P, 1,3, 2,2);
 tau := P1i*P2;
 
+/*
+print "";
+print "Invariant reconstruction:";
+j := AlgebraizedInvariants(tau, F);
+print j;
+*/
+
 print "";
 print "Arithmetic reconstruction over base:";
 Y := ReconstructCurve(P, F : Base := true);

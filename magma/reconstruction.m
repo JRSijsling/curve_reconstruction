@@ -16,6 +16,9 @@ forward ReconstructCurveGeometricG3;
 forward ReconstructCurveG1;
 forward ReconstructCurveG2;
 forward ReconstructCurveG3;
+forward AlgebraizedInvariantsG1;
+forward AlgebraizedInvariantsG2;
+forward AlgebraizedInvariantsG3;
 
 
 function TransformForm(f, T : co := true, contra := false)
@@ -46,7 +49,7 @@ end intrinsic;
 
 
 intrinsic ReconstructCurve(P::., K::Fld : Base := false) -> Crv
-{Reconstruct curve from big period matrix P. The end result will be over an extension of K.}
+{Reconstruct curve from the big period matrix P. The end result will be over an extension of K.}
 
 g := #Rows(P);
 if g eq 1 then
@@ -55,6 +58,23 @@ elif g eq 2 then
     return ReconstructCurveG2(P, K : Base := Base);
 elif g eq 3 then
     return ReconstructCurveG3(P, K : Base := Base);
+else
+    error "Genus too large!";
+end if;
+
+end intrinsic;
+
+
+intrinsic AlgebraizedInvariants(tau::., K::Fld : Base := false) -> .
+{Reconstruct invariants from the small period matrix tau. The end result will be over an extension of K.}
+
+g := #Rows(tau);
+if g eq 1 then
+    return AlgebraizedInvariantsG1(tau, K : Base := Base);
+elif g eq 2 then
+    return AlgebraizedInvariantsG2(tau, K : Base := Base);
+elif g eq 3 then
+    return AlgebraizedInvariantsG3(tau, K : Base := Base);
 else
     error "Genus too large!";
 end if;
@@ -150,6 +170,26 @@ R := HomologyRepresentation(A, P, Q);
 vprint CurveRec, 2 : "done.";
 
 return X, hKL, true;
+
+end function;
+
+
+function AlgebraizedInvariantsG1(tau, K : Base := false)
+
+assert IsSmallPeriodMatrix(tau);
+jCC := jInvariant(tau[1,1]);
+if Base then
+    test, j := AlgebraizeElement(jCC, K);
+    if not test then
+        vprint CurveRec : "";
+        vprint CurveRec : "Failed to algebraize";
+        return 0, 0, false;
+    end if;
+    hKL := CanonicalInclusionMap(K, K);
+else
+    L, Lj, hKL := NumberFieldExtra([ jCC ], K); j := Lj[1];
+end if;
+return j, hKL, true;
 
 end function;
 
@@ -382,6 +422,81 @@ return Y, hKL, true;
 end function;
 
 
+function AlgebraizedInvariantsG2(tau, K : Base := false)
+
+assert IsSmallPeriodMatrix(tau);
+CC := BaseRing(tau);
+P := HorizontalJoin(IdentityMatrix(CC, 2), tau);
+
+/* Reduce small period matrix */
+taunew, gamma := ReduceSmallPeriodMatrix(tau);
+Imtaunew := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(taunew) ]);
+
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2 : "Eigenvalues of imaginary part of reduced tau:";
+vprint CurveRec, 2 : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
+
+/* Calculate corresponding big period matrix */
+A := Transpose(Submatrix(gamma, 1,1, 2,2));
+B := Transpose(Submatrix(gamma, 1,3, 2,2));
+C := Transpose(Submatrix(gamma, 3,1, 2,2));
+D := Transpose(Submatrix(gamma, 3,3, 2,2));
+Pnew := P * BlockMatrix([[D, B], [C, A]]);
+P1new := Submatrix(Pnew, 1,1, 2,2); P1inew := P1new^(-1);
+P2new := Submatrix(Pnew, 1,3, 2,2);
+
+/* Calculation of theta derivatives at odd two-torsion points */
+w1 := (1/2)*taunew*Transpose(Matrix(CC, [[0,1]])) + (1/2)*Transpose(Matrix(CC, [[0,1]]));
+w2 := (1/2)*taunew*Transpose(Matrix(CC, [[0,1]])) + (1/2)*Transpose(Matrix(CC, [[1,1]]));
+w3 := (1/2)*taunew*Transpose(Matrix(CC, [[1,0]])) + (1/2)*Transpose(Matrix(CC, [[1,0]]));
+w4 := (1/2)*taunew*Transpose(Matrix(CC, [[1,0]])) + (1/2)*Transpose(Matrix(CC, [[1,1]]));
+w5 := (1/2)*taunew*Transpose(Matrix(CC, [[1,1]])) + (1/2)*Transpose(Matrix(CC, [[0,1]]));
+w6 := (1/2)*taunew*Transpose(Matrix(CC, [[1,1]])) + (1/2)*Transpose(Matrix(CC, [[1,0]]));
+ws := [ w1, w2, w3, w4, w5, w6 ];
+
+vprint CurveRec : "";
+vprint CurveRec : "Calculating theta derivatives...";
+theta_derss := [ ThetaDerivatives(taunew, w) : w in ws ];
+vprint CurveRec : "done calculating theta derivatives.";
+
+/* Determination of ratios = roots */
+Hs := [ Matrix(CC, [ theta_ders ]) * P1inew : theta_ders in theta_derss ];
+rats := [ ];
+for H in Hs do
+    seq := Eltseq(H);
+    add := true;
+    if Abs(seq[2]) lt Abs(seq[1]) then
+        if Abs(seq[2]/seq[1])^2 lt CC`epscomp then
+            add := false;
+        end if;
+    end if;
+    if add then
+        Append(~rats, -seq[1]/seq[2]);
+    end if;
+end for;
+
+/* Recover polynomial over CC up to a constant */
+RCC := PolynomialRing(CC); R := PolynomialRing(K);
+fCC := &*[ RCC.1 - rat : rat in rats ];
+
+ICC := IgusaInvariants(fCC); W := [ 2, 4, 6, 8, 10 ];
+ICC := WPSNormalizeCC(W, ICC);
+if Base then
+    test, I := AlgebraizeElements(ICC, K);
+    if not test then
+        vprint CurveRec : "";
+        vprint CurveRec : "Failed to algebraize";
+        return 0, 0, false;
+    end if;
+    L := K; hKL := CanonicalInclusionMap(K, L);
+else
+    L, I, hKL := NumberFieldExtra(ICC, K);
+end if;
+return I, hKL, true;
+
+end function;
+
+
 function ReconstructCurveGeometricG3(tau, K : Base := Base)
 
 /* Calculate thetas and see in which case we are */
@@ -446,47 +561,6 @@ end if;
 end function;
 
 
-intrinsic AlgebraizedInvariants(tau::AlgMatElt, K::Fld) -> .
-{Returns invariants algebraized in given base.}
-
-/* Calculate thetas and see in which case we are */
-assert IsSmallPeriodMatrix(tau);
-taunew := ReduceSmallPeriodMatrix(tau);
-assert IsSmallPeriodMatrix(taunew);
-vprint CurveRec, 2 : "";
-vprint CurveRec, 2: "Calculating theta values...";
-thetas, thetas_sq := ThetaValues(taunew);
-vprint CurveRec, 2: "done";
-
-v0s := FindDelta(thetas_sq);
-vprint CurveRec, 2 : "";
-vprint CurveRec, 2: "Number of non-zero even theta values:";
-vprint CurveRec, 2: #v0s;
-
-if #v0s gt 1 then
-    vprint CurveRec : "";
-    vprint CurveRec : "At least two vanishing even characteristics";
-    return false, 0;
-end if;
-
-if #v0s eq 0 then
-    ICC := DixmierOhnoInvariantsFromThetas(thetas);
-else
-    ICC := ShiodaInvariantsFromThetaSquares(thetas_sq);
-end if;
-test, I := AlgebraizeElements(ICC, K);
-
-vprint CurveRec : "";
-if test then
-    vprint CurveRec : "Successfully algebraized invariants";
-else
-    vprint CurveRec : "Failed to algebraize invariants";
-end if;
-return test, I;
-
-end intrinsic;
-
-
 function ReconstructCurveG3(P, K : Base := Base)
 /* Only for plane quartic curves currently, hyperelliptic curves soon to follow */
 
@@ -548,5 +622,49 @@ R := PolynomialRing(L, 3);
 F0 := &+[ coeffs[i]*Monomial(R, exps[i]) : i in [1..#coeffs] ];
 X0 := PlaneCurve(F0);
 return X0, hKL, true;
+
+end function;
+
+
+function AlgebraizedInvariantsG3(tau, K : Base := false)
+
+/* Calculate thetas and see in which case we are */
+assert IsSmallPeriodMatrix(tau);
+taunew := ReduceSmallPeriodMatrix(tau);
+assert IsSmallPeriodMatrix(taunew);
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2: "Calculating theta values...";
+thetas, thetas_sq := ThetaValues(taunew);
+vprint CurveRec, 2: "done";
+
+v0s := FindDelta(thetas_sq);
+vprint CurveRec, 2 : "";
+vprint CurveRec, 2: "Number of non-zero even theta values:";
+vprint CurveRec, 2: #v0s;
+
+if #v0s gt 1 then
+    vprint CurveRec : "";
+    vprint CurveRec : "At least two vanishing even characteristics";
+    return 0, 0, false;
+end if;
+
+if #v0s eq 0 then
+    ICC := DixmierOhnoInvariantsFromThetas(thetas);
+else
+    ICC := ShiodaInvariantsFromThetaSquares(thetas_sq);
+end if;
+
+if Base then
+    test, I := AlgebraizeElements(ICC, K);
+    if not test then
+        vprint CurveRec : "";
+        vprint CurveRec : "Failed to algebraize";
+        return 0, 0, false;
+    end if;
+    L := K; hKL := CanonicalInclusionMap(K, L);
+else
+    L, I, hKL := NumberFieldExtra(ICC, K);
+end if;
+return I, hKL, true;
 
 end function;

@@ -22,6 +22,11 @@ P2 := Submatrix(P, 1,2, 1,1);
 tau := P1i*P2;
 
 print "";
+print "Invariant reconstruction:";
+j := AlgebraizedInvariants(tau, F);
+print j;
+
+print "";
 print "Geometric reconstruction:";
 X := ReconstructCurveGeometric(tau, F);
 print X;

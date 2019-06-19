@@ -11,7 +11,7 @@ SetVerbose("Reconstruction", 1);
 SetVerbose("CurveRec", 1);
 
 // TODO: We should be able to set this lower, the current state of affairs is ridiculous
-prec := 200;
+prec := 300;
 F := RationalsExtra(prec);
 CC := F`CC;
 
@@ -32,6 +32,13 @@ P1 := Submatrix(P, 1,1, 3,3); P1i := P1^(-1);
 P2 := Submatrix(P, 1,4, 3,3);
 tau := P1i*P2;
 
+/*
+print "";
+print "Invariant reconstruction:";
+I := AlgebraizedInvariants(tau, F);
+print I;
+*/
+
 print "";
 print "Geometric reconstruction:";
 Y := ReconstructCurveGeometric(tau, F : Base := true);
@@ -42,10 +49,12 @@ print "";
 print "Check invariants:";
 print WPSNormalize(W, I) eq WPSNormalize(W, J);
 
-Y := ReconstructCurve(P, F : Base := true);
-g := R ! DefiningPolynomial(Y);
+/* Not yet quite all right
+Y := ReconstructCurve(P, F : Base := false);
+g := DefiningPolynomial(Y);
 print "";
 print "Arithmetic reconstruction over base:";
 print PlaneCurve(g);
 assert f eq g;
+*/
 

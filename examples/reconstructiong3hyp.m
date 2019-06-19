@@ -36,6 +36,13 @@ print "";
 print "Invariants:";
 print WPSNormalize(W, S);
 
+/*
+print "";
+print "Invariant reconstruction:";
+S := AlgebraizedInvariants(tau, F);
+print S;
+*/
+
 Y := ReconstructCurveGeometric(tau, F : Base := false);
 T, W := ShiodaInvariants(Y);
 print "";
