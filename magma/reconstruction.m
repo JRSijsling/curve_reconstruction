@@ -593,7 +593,7 @@ vprint CurveRec, 2 : "done determining period matrix of geometric reconstruction
 
 vprint CurveRec, 2 : "";
 vprint CurveRec, 2 : "Determining isomorphisms with original period matrix:";
-isos := IsomorphismsCC(P, Q);
+isos := SymplecticIsomorphismsCC(P, Q);
 vprint CurveRec, 2 : "done.";
 
 T := isos[1][1];
