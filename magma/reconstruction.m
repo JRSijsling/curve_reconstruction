@@ -387,24 +387,26 @@ else
         error "Failed to identify correct twist";
     end if;
 end if;
-vprint CurveRec : "";
+vprint CurveRec, 2 : "";
 vprint CurveRec : "done identifying correct twist.";
 
 /* Recover twisted polynomial over number field */
 fCC := lam^2*fCC; coeffsCC := Coefficients(fCC);
 coeffsCC := ChangeUniverse(coeffsCC, K`CC);
 
+vprint CurveRec : "";
+vprint CurveRec : "Algebraizing elements...";
 if Base then
     test, coeffs := AlgebraizeElements(coeffsCC, K);
     if not test then
-        vprint CurveRec : "";
-        vprint CurveRec : "Failed to algebraize";
+        vprint CurveRec : "Failed to algebraize.";
         return 0, 0, false;
     end if;
     L := K; hKL := CanonicalInclusionMap(K, L);
 else
     L, coeffs, hKL := NumberFieldExtra(coeffsCC, K);
 end if;
+vprint CurveRec : "done.";
 
 R := PolynomialRing(L);
 f := &+[ coeffs[i]*R.1^(i - 1) : i in [1..#coeffs] ];
