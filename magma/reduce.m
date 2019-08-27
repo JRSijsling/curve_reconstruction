@@ -11,7 +11,7 @@
 function IsSymmetricImproved(M : prec := 0)
 /* To avoid stupid numerical behavior of IsSymmetric */
 if prec eq 0 then
-    CC := BaseRing(M); prec := Floor(-Log(CC`epscomp)/Log(10));
+    CC := BaseRing(M); prec := Floor(-Log(CC`epscomp)/Log(10)) div 2;
 end if;
 return Max([ Abs(c) : c in Eltseq(M - Transpose(M)) ]) lt 10^(-prec);
 end function;
@@ -20,7 +20,7 @@ end function;
 function IsPositiveDefiniteImproved(M : prec := 0);
 /* To avoid stupid numerical behavior of IsPositiveDefinite */
 if prec eq 0 then
-    RR := BaseRing(M); prec := Floor(-Log(RR`epscomp)/Log(10));
+    RR := BaseRing(M); prec := Floor(-Log(RR`epscomp)/Log(10)) div 2;
 end if;
 RRSmall := RealField(prec);
 /* Deal with zero entries that are represented by 10^(-N) */
