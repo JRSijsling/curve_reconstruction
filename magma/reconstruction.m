@@ -87,7 +87,7 @@ function ReconstructCurveGeometricG1(tau, K : Base := false)
 assert IsSmallPeriodMatrix(tau);
 jCC := jInvariant(tau[1,1]);
 if Base then
-    test, j := AlgebraizeElement(jCC, K);
+    test, j := AlgebraizeElementExtra(jCC, K);
     if not test then
         vprint CurveRec : "";
         vprint CurveRec : "Failed to algebraize";
@@ -142,8 +142,8 @@ g4CC := 120 * (1/Pnew[1,1])^4 * ZetaFunction(RR, 4) * Eisenstein(4, Eltseq(Pnew)
 g6CC := 280 * (1/Pnew[1,1])^6 * ZetaFunction(RR, 6) * Eisenstein(6, Eltseq(Pnew));
 
 if Base then
-    testg4, g4 := AlgebraizeElement(g4CC, K);
-    testg6, g6 := AlgebraizeElement(g6CC, K);
+    testg4, g4 := AlgebraizeElementExtra(g4CC, K);
+    testg6, g6 := AlgebraizeElementExtra(g6CC, K);
     if not (testg4 and testg6) then
         vprint CurveRec : "";
         vprint CurveRec : "Failed to algebraize";
@@ -179,7 +179,7 @@ function AlgebraizedInvariantsG1(tau, K : Base := false)
 assert IsSmallPeriodMatrix(tau);
 jCC := jInvariant(tau[1,1]);
 if Base then
-    test, j := AlgebraizeElement(jCC, K);
+    test, j := AlgebraizeElementExtra(jCC, K);
     if not test then
         vprint CurveRec : "";
         vprint CurveRec : "Failed to algebraize";
@@ -256,7 +256,7 @@ fCC := &*[ RCC.1 - rat : rat in rats ];
 ICC := IgusaInvariants(fCC); W := [ 2, 4, 6, 8, 10 ];
 ICC := WPSNormalizeCC(W, ICC);
 if Base then
-    test, I := AlgebraizeElements(ICC, K);
+    test, I := AlgebraizeElementsExtra(ICC, K);
     if not test then
         vprint CurveRec : "";
         vprint CurveRec : "Failed to algebraize";
@@ -397,7 +397,7 @@ coeffsCC := ChangeUniverse(coeffsCC, K`CC);
 vprint CurveRec : "";
 vprint CurveRec : "Algebraizing elements...";
 if Base then
-    test, coeffs := AlgebraizeElements(coeffsCC, K);
+    test, coeffs := AlgebraizeElementsExtra(coeffsCC, K);
     if not test then
         vprint CurveRec : "Failed to algebraize.";
         return 0, 0, false;
@@ -484,7 +484,7 @@ fCC := &*[ RCC.1 - rat : rat in rats ];
 ICC := IgusaInvariants(fCC); W := [ 2, 4, 6, 8, 10 ];
 ICC := WPSNormalizeCC(W, ICC);
 if Base then
-    test, I := AlgebraizeElements(ICC, K);
+    test, I := AlgebraizeElementsExtra(ICC, K);
     if not test then
         vprint CurveRec : "";
         vprint CurveRec : "Failed to algebraize";
@@ -519,7 +519,7 @@ if #v0s eq 0 then
     ICC := DixmierOhnoInvariantsFromThetas(thetas);
 
     if Base then
-        test, I := AlgebraizeElements(ICC, K);
+        test, I := AlgebraizeElementsExtra(ICC, K);
         if not test then
             vprint CurveRec : "";
             vprint CurveRec : "Failed to algebraize";
@@ -540,7 +540,7 @@ elif #v0s eq 1 then
     ICC := ShiodaInvariantsFromThetaSquares(thetas_sq);
 
     if Base then
-        test, I := AlgebraizeElements(ICC, K);
+        test, I := AlgebraizeElementsExtra(ICC, K);
         if not test then
             vprint CurveRec : "";
             vprint CurveRec : "Failed to algebraize";
@@ -609,7 +609,7 @@ coeffsCC := [ MonomialCoefficient(fCC, monCC) : monCC in monsCC ];
 exps := [ Exponents(monCC) : monCC in monsCC ];
 
 if Base then
-    test, coeffs := AlgebraizeElements(coeffsCC, K);
+    test, coeffs := AlgebraizeElementsExtra(coeffsCC, K);
     if not test then
         vprint CurveRec : "";
         vprint CurveRec : "Failed to algebraize";
@@ -657,7 +657,7 @@ else
 end if;
 
 if Base then
-    test, I := AlgebraizeElements(ICC, K);
+    test, I := AlgebraizeElementsExtra(ICC, K);
     if not test then
         vprint CurveRec : "";
         vprint CurveRec : "Failed to algebraize";
