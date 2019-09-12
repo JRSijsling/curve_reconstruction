@@ -163,6 +163,7 @@ if Labrande then
         else
             thetasmall := Theta(v, M0, tausmall);
             thetasqrt := Sqrt(thetas_sq[i]);
+
             /* TODO: Ditch fixed precision */
             if Abs(thetasqrt - thetasmall) le 10^(-10) then
                 Append(~thetas, thetasqrt);

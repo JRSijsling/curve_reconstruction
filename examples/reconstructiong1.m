@@ -6,20 +6,27 @@
  *  See LICENSE.txt for license details.
  */
 
-SetVerbose("EndoFind", 0);
+SetVerbose("EndoFind", 1);
+SetVerbose("CurveRec", 1);
 
 prec := 300;
 F := RationalsExtra(prec);
-CC := F`CC;
-R<x> := PolynomialRing(CC);
+R<x> := PolynomialRing(F);
 
-// Define curve
-f := x^3 + x + 1;
-X := SE_Curve(f, 2 : Prec := prec);
-P := ChangeRing(X`BigPeriodMatrix, CC);
-P1 := Submatrix(P, 1,1, 1,1); P1i := P1^(-1);
-P2 := Submatrix(P, 1,2, 1,1);
-tau := P1i*P2;
+f := x^3 + x + 7;
+X := HyperellipticCurve(f);
+P := PeriodMatrix(X);
+
+print "";
+print "Curve:";
+print X;
+
+print "";
+print "Mess up homology by:";
+U := RandomSymplecticMatrix(1, 2);
+print U;
+P := P*ChangeRing(U, BaseRing(P));
+tau := SmallPeriodMatrix(P);
 
 print "";
 print "Invariant reconstruction:";
@@ -39,13 +46,4 @@ print X;
 print "";
 print "Arithmetic reconstruction over base:";
 X := ReconstructCurve(P, F : Base := true);
-print X;
-
-f := x^3 + Sqrt(CC ! 2)*x + Sqrt(CC ! 3) + Sqrt(CC ! 5);
-X := SE_Curve(f, 2 : Prec := prec);
-P := ChangeRing(X`BigPeriodMatrix, CC);
-
-print "";
-print "Arithmetic reconstruction:";
-X := ReconstructCurve(P, F);
 print X;

@@ -6,6 +6,10 @@
  *  See LICENSE.txt for license details.
  */
 
+/* The conventions on period matrices are different in these programs, since
+ * Guardia uses the current ones. We therefore leave the more elegant
+ * conventions of Birkenhake--Lange, but only locally */
+
 
 import "riemann.m": DixmierOhnoInvariantsFromThetas;
 import "rosenhain.m": FindDelta, ShiodaInvariantsFromThetaSquares;
@@ -125,21 +129,17 @@ vprint CurveRec, 2 : "Eigenvalues of imaginary part of reduced tau:";
 vprint CurveRec, 2 : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
 
 /* Calculate corresponding big period matrix */
-A := Transpose(Submatrix(gamma, 1,1, 1,1));
-B := Transpose(Submatrix(gamma, 1,2, 1,1));
-C := Transpose(Submatrix(gamma, 2,1, 1,1));
-D := Transpose(Submatrix(gamma, 2,2, 1,1));
-Pnew := P * BlockMatrix([[D, B], [C, A]]);
-P1new := Submatrix(Pnew, 1,1, 1,1); P1inew := P1new^(-1);
-P2new := Submatrix(Pnew, 1,2, 1,1);
+A := Submatrix(gamma, 1,1, 1,1);
+B := Submatrix(gamma, 1,2, 1,1);
+C := Submatrix(gamma, 2,1, 1,1);
+D := Submatrix(gamma, 2,2, 1,1);
+Pnew := P * Transpose(BlockMatrix([[A, B], [C, D]]));
 
 /* Classical elliptic functions */
 CC := Parent(Pnew[1,1]); RR := RealField(CC);
-if Im(Pnew[1,2]/Pnew[1,1]) lt 0 then
-    Pnew := Matrix([ [ Pnew[1,2], Pnew[1,1] ] ]);
-end if;
-g4CC := 120 * (1/Pnew[1,1])^4 * ZetaFunction(RR, 4) * Eisenstein(4, Eltseq(Pnew));
-g6CC := 280 * (1/Pnew[1,1])^6 * ZetaFunction(RR, 6) * Eisenstein(6, Eltseq(Pnew));
+assert Im(Pnew[1,1]/Pnew[1,2]) gt 0;
+g4CC := 120 * (1/Pnew[1,2])^4 * ZetaFunction(RR, 4) * Eisenstein(4, Reverse(Eltseq(Pnew)));
+g6CC := 280 * (1/Pnew[1,2])^6 * ZetaFunction(RR, 6) * Eisenstein(6, Reverse(Eltseq(Pnew)));
 
 if Base then
     testg4, g4 := AlgebraizeElementExtra(g4CC, K);
@@ -200,7 +200,7 @@ function ReconstructCurveGeometricG2(tau, K : Base := false)
 
 assert IsSmallPeriodMatrix(tau);
 CC := BaseRing(tau);
-P := HorizontalJoin(IdentityMatrix(CC, 2), tau);
+P := HorizontalJoin(tau, IdentityMatrix(CC, 2));
 
 /* Reduce small period matrix */
 taunew, gamma := ReduceSmallPeriodMatrix(tau);
@@ -211,13 +211,14 @@ vprint CurveRec, 2 : "Eigenvalues of imaginary part of reduced tau:";
 vprint CurveRec, 2 : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
 
 /* Calculate corresponding big period matrix */
-A := Transpose(Submatrix(gamma, 1,1, 2,2));
-B := Transpose(Submatrix(gamma, 1,3, 2,2));
-C := Transpose(Submatrix(gamma, 3,1, 2,2));
-D := Transpose(Submatrix(gamma, 3,3, 2,2));
-Pnew := P * BlockMatrix([[D, B], [C, A]]);
-P1new := Submatrix(Pnew, 1,1, 2,2); P1inew := P1new^(-1);
+A := Submatrix(gamma, 1,1, 2,2);
+B := Submatrix(gamma, 1,3, 2,2);
+C := Submatrix(gamma, 3,1, 2,2);
+D := Submatrix(gamma, 3,3, 2,2);
+Pnew := P * Transpose(BlockMatrix([[A, B], [C, D]]));
+P1new := Submatrix(Pnew, 1,1, 2,2);
 P2new := Submatrix(Pnew, 1,3, 2,2);
+P2inew := P2new^(-1);
 
 /* Calculation of theta derivatives at odd two-torsion points */
 w1 := (1/2)*taunew*Transpose(Matrix(CC, [[0,1]])) + (1/2)*Transpose(Matrix(CC, [[0,1]]));
@@ -234,7 +235,7 @@ theta_derss := [ ThetaDerivatives(taunew, w) : w in ws ];
 vprint CurveRec : "done calculating theta derivatives.";
 
 /* Determination of ratios = roots */
-Hs := [ Matrix(CC, [ theta_ders ]) * P1inew : theta_ders in theta_derss ];
+Hs := [ Matrix(CC, [ theta_ders ]) * P2inew : theta_ders in theta_derss ];
 rats := [ ];
 for H in Hs do
     seq := Eltseq(H);
@@ -307,14 +308,14 @@ vprint CurveRec, 2 : "Eigenvalues of imaginary part of reduced tau:";
 vprint CurveRec, 2 : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
 
 /* Calculate corresponding big period matrix */
-A := Transpose(Submatrix(gamma, 1,1, 2,2));
-B := Transpose(Submatrix(gamma, 1,3, 2,2));
-C := Transpose(Submatrix(gamma, 3,1, 2,2));
-D := Transpose(Submatrix(gamma, 3,3, 2,2));
-T := BlockMatrix([[D, B], [C, A]]);
-Pnew := P * T;
-P1new := Submatrix(Pnew, 1,1, 2,2); P1inew := P1new^(-1);
+A := Submatrix(gamma, 1,1, 2,2);
+B := Submatrix(gamma, 1,3, 2,2);
+C := Submatrix(gamma, 3,1, 2,2);
+D := Submatrix(gamma, 3,3, 2,2);
+Pnew := P * Transpose(BlockMatrix([[A, B], [C, D]]));
+P1new := Submatrix(Pnew, 1,1, 2,2);
 P2new := Submatrix(Pnew, 1,3, 2,2);
+P2inew := P2new^(-1);
 
 /* Calculation of theta derivatives at odd two-torsion points */
 w1 := (1/2)*taunew*Transpose(Matrix(CC, [[0,1]])) + (1/2)*Transpose(Matrix(CC, [[0,1]]));
@@ -331,7 +332,7 @@ theta_derss := [ ThetaDerivatives(taunew, w) : w in ws ];
 vprint CurveRec : "done calculating theta derivatives.";
 
 /* Determination of ratios = roots */
-Hs := [ Matrix(CC, [ theta_ders ]) * P1inew : theta_ders in theta_derss ];
+Hs := [ Matrix(CC, [ theta_ders ]) * P2inew : theta_ders in theta_derss ];
 rats := [ ];
 for H in Hs do
     seq := Eltseq(H);
@@ -428,7 +429,7 @@ function AlgebraizedInvariantsG2(tau, K : Base := false)
 
 assert IsSmallPeriodMatrix(tau);
 CC := BaseRing(tau);
-P := HorizontalJoin(IdentityMatrix(CC, 2), tau);
+P := HorizontalJoin(tau, IdentityMatrix(CC, 2));
 
 /* Reduce small period matrix */
 taunew, gamma := ReduceSmallPeriodMatrix(tau);
@@ -439,13 +440,14 @@ vprint CurveRec, 2 : "Eigenvalues of imaginary part of reduced tau:";
 vprint CurveRec, 2 : [ ComplexField(5) ! tup[1] : tup in Eigenvalues(Imtaunew) ];
 
 /* Calculate corresponding big period matrix */
-A := Transpose(Submatrix(gamma, 1,1, 2,2));
-B := Transpose(Submatrix(gamma, 1,3, 2,2));
-C := Transpose(Submatrix(gamma, 3,1, 2,2));
-D := Transpose(Submatrix(gamma, 3,3, 2,2));
-Pnew := P * BlockMatrix([[D, B], [C, A]]);
-P1new := Submatrix(Pnew, 1,1, 2,2); P1inew := P1new^(-1);
+A := Submatrix(gamma, 1,1, 2,2);
+B := Submatrix(gamma, 1,3, 2,2);
+C := Submatrix(gamma, 3,1, 2,2);
+D := Submatrix(gamma, 3,3, 2,2);
+Pnew := P * Transpose(BlockMatrix([[A, B], [C, D]]));
+P1new := Submatrix(Pnew, 1,1, 2,2);
 P2new := Submatrix(Pnew, 1,3, 2,2);
+P2inew := P2new^(-1);
 
 /* Calculation of theta derivatives at odd two-torsion points */
 w1 := (1/2)*taunew*Transpose(Matrix(CC, [[0,1]])) + (1/2)*Transpose(Matrix(CC, [[0,1]]));
@@ -462,7 +464,7 @@ theta_derss := [ ThetaDerivatives(taunew, w) : w in ws ];
 vprint CurveRec : "done calculating theta derivatives.";
 
 /* Determination of ratios = roots */
-Hs := [ Matrix(CC, [ theta_ders ]) * P1inew : theta_ders in theta_derss ];
+Hs := [ Matrix(CC, [ theta_ders ]) * P2inew : theta_ders in theta_derss ];
 rats := [ ];
 for H in Hs do
     seq := Eltseq(H);

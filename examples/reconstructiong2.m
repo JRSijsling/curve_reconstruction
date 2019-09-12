@@ -9,10 +9,9 @@
 SetVerbose("EndoFind", 1);
 SetVerbose("CurveRec", 1);
 
-prec := 500;
+prec := 300;
 F := RationalsExtra(prec);
-CC := F`CC;
-R<x> := PolynomialRing(CC);
+R<x> := PolynomialRing(F);
 
 //Define curve
 R<x> := PolynomialRing(F);
@@ -24,36 +23,36 @@ repeat
 until IsSquarefree(f) and (Degree(f) in [5,6]);
 f := -x^6 - 5*x^5 - 3*x^4 + 3*x^2 - 5*x - 2;
 
-print "";
-print "Input polynomial:";
-print f;
+X := HyperellipticCurve(f);
+P := PeriodMatrix(X);
 
-X := SE_Curve(f, 2 : Prec := prec);
-P := ChangeRing(X`BigPeriodMatrix, CC) / 2;
+print "";
+print "Curve:";
+print X;
 
 print "";
 print "Mess up homology by:";
 U := RandomSymplecticMatrix(2, 2);
 print U;
-P := P*ChangeRing(U, CC);
+P := P*ChangeRing(U, BaseRing(P));
+tau := SmallPeriodMatrix(P);
 
-P1 := Submatrix(P, 1,1, 2,2); P1i := P1^(-1);
-P2 := Submatrix(P, 1,3, 2,2);
-tau := P1i*P2;
-
-/*
 print "";
 print "Invariant reconstruction:";
-j := AlgebraizedInvariants(tau, F);
-print j;
-*/
+I := AlgebraizedInvariants(tau, F);
+print I;
+
+print "";
+print "Geometric reconstruction:";
+X := ReconstructCurveGeometric(tau, F);
+print X;
+
+print "";
+print "Geometric reconstruction over base:";
+X := ReconstructCurveGeometric(tau, F : Base := true);
+print X;
 
 print "";
 print "Arithmetic reconstruction over base:";
-Y := ReconstructCurve(P, F : Base := true);
-print "";
-print Y;
-
-print "";
-print "Recover correct curve?";
-print HyperellipticPolynomials(Y) eq f;
+X := ReconstructCurve(P, F : Base := true);
+print X;

@@ -39,22 +39,17 @@ intrinsic IsSmallPeriodMatrix(tau::.) -> BoolElt
 {Returns whether tau is (numerically) a small period matrix.}
 Imtau := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(tau) ]);
 test := IsSymmetricImproved(tau) and IsPositiveDefiniteImproved(Imtau);
-if not test then
-    vprint CurveRec, 2  : "";
-    vprint CurveRec, 2 : "Not a small period matrix:";
-    vprint CurveRec, 2 : tau;
-end if;
 return test;
 end intrinsic;
 
 
 intrinsic SmallPeriodMatrix(P::ModMatFldElt) -> .
-{Returns small period matrix associated to P.}
+{Returns small period matrix associated to P. Conventions as in Birkenhake--Lange: we need that (0 1 -1 0) defines a polarization.}
 g := #Rows(P);
 P1 := Submatrix(P, 1,1,   g,g);
 P2 := Submatrix(P, 1,g+1, g,g);
-P1i := P1^(-1);
-tau := P1i*P2;
+P2i := P2^(-1);
+tau := P2i*P1;
 return tau;
 end intrinsic;
 
@@ -66,7 +61,7 @@ end intrinsic;
 
 
 intrinsic LeftActionHg(M::AlgMatElt, tau::AlgMatElt) -> AlgMatElt
-{Left symplectic action (by some definitions)}
+{Left symplectic action corresponding to transpose of natural right action on (tau 1).}
 assert IsSmallPeriodMatrix(tau);
 g := #Rows(tau);
 A := Submatrix(M, 1,  1, g,g); B := Submatrix(M, 1,  g+1, g,g);
