@@ -38,6 +38,7 @@ end function;
 intrinsic ReconstructCurveGeometric(tau::AlgMatElt, K::Fld : Base := false) -> Crv
 {Reconstruct curve from small period matrix tau. The end result will be over an extension of K.}
 
+assert IsSmallPeriodMatrix(tau);
 g := #Rows(tau);
 if g eq 1 then
     return ReconstructCurveGeometricG1(tau, K : Base := Base);
@@ -55,6 +56,7 @@ end intrinsic;
 intrinsic ReconstructCurve(P::., K::Fld : Base := false) -> Crv
 {Reconstruct curve from the big period matrix P. The end result will be over an extension of K.}
 
+assert IsBigPeriodMatrix(P);
 g := #Rows(P);
 if g eq 1 then
     return ReconstructCurveG1(P, K : Base := Base);
@@ -72,6 +74,7 @@ end intrinsic;
 intrinsic AlgebraizedInvariants(tau::., K::Fld : Base := false) -> .
 {Reconstruct invariants from the small period matrix tau. The end result will be over an extension of K.}
 
+assert IsSmallPeriodMatrix(tau);
 g := #Rows(tau);
 if g eq 1 then
     return AlgebraizedInvariantsG1(tau, K : Base := Base);
@@ -88,7 +91,6 @@ end intrinsic;
 
 function ReconstructCurveGeometricG1(tau, K : Base := false)
 
-assert IsSmallPeriodMatrix(tau);
 jCC := jInvariant(tau[1,1]);
 if Base then
     test, j := AlgebraizeElementExtra(jCC, K);
@@ -117,7 +119,6 @@ function ReconstructCurveG1(P, K : Base := false)
 
 /* Check small period matrix */
 tau := SmallPeriodMatrix(P);
-assert IsSmallPeriodMatrix(tau);
 CC := BaseRing(Parent(tau));
 
 /* Reduce small period matrix */
@@ -176,7 +177,6 @@ end function;
 
 function AlgebraizedInvariantsG1(tau, K : Base := false)
 
-assert IsSmallPeriodMatrix(tau);
 jCC := jInvariant(tau[1,1]);
 if Base then
     test, j := AlgebraizeElementExtra(jCC, K);
@@ -198,7 +198,6 @@ function ReconstructCurveGeometricG2(tau, K : Base := false)
 /* Alternative: implement variant of BILV */
 /* TODO: Add check of not being product of elliptic curves */
 
-assert IsSmallPeriodMatrix(tau);
 CC := BaseRing(tau);
 P := HorizontalJoin(tau, IdentityMatrix(CC, 2));
 
@@ -296,7 +295,6 @@ function ReconstructCurveG2(P, K : Base := false, Dom := [-5..5])
 
 /* Reduce small period matrix */
 tau := SmallPeriodMatrix(P);
-assert IsSmallPeriodMatrix(tau);
 CC := BaseRing(Parent(tau));
 
 /* Reduce small period matrix */
@@ -427,7 +425,6 @@ end function;
 
 function AlgebraizedInvariantsG2(tau, K : Base := false)
 
-assert IsSmallPeriodMatrix(tau);
 CC := BaseRing(tau);
 P := HorizontalJoin(tau, IdentityMatrix(CC, 2));
 
@@ -504,7 +501,6 @@ end function;
 function ReconstructCurveGeometricG3(tau, K : Base := Base)
 
 /* Calculate thetas and see in which case we are */
-assert IsSmallPeriodMatrix(tau);
 taunew := ReduceSmallPeriodMatrix(tau);
 assert IsSmallPeriodMatrix(taunew);
 vprint CurveRec, 2 : "";
@@ -571,7 +567,6 @@ function ReconstructCurveG3(P, K : Base := Base)
 /* Reduce small period matrix */
 
 tau := SmallPeriodMatrix(P);
-assert IsSmallPeriodMatrix(tau);
 CC := BaseRing(Parent(tau));
 
 Y, hKL, test := ReconstructCurveGeometricG3(tau, K : Base := Base);
@@ -633,7 +628,6 @@ end function;
 function AlgebraizedInvariantsG3(tau, K : Base := false)
 
 /* Calculate thetas and see in which case we are */
-assert IsSmallPeriodMatrix(tau);
 taunew := ReduceSmallPeriodMatrix(tau);
 assert IsSmallPeriodMatrix(taunew);
 vprint CurveRec, 2 : "";
