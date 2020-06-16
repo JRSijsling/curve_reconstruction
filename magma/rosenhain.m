@@ -15,17 +15,11 @@ import "precomp.m": PrecomputedGamma;
 intrinsic WPSNormalizeCC(W::SeqEnum, S::SeqEnum : prec := 0) -> SeqEnum
 {Better version of WPSNormalize over CC.}
 CC := Parent(S[1]);
-if prec eq 0 then
-    prec := Precision(CC) / 2;
-end if;
+if prec eq 0 then prec := Precision(CC) / 2; end if;
 I := [ i : i in [1..#S] | not Abs(S[i]) lt 10^(-prec) ];
-WT := [ W[i] : i in I ];
-T := [ S[i] : i in I ];
-T0 := WPSNormalize(WT, T);
-S0 := [ CC ! 0 : s in S ];
-for i in [1..#I] do
-    S0[I[i]] := T0[i];
-end for;
+WT := [ W[i] : i in I ]; T := [ S[i] : i in I ];
+T0 := WPSNormalize(WT, T); S0 := [ CC ! 0 : s in S ];
+for i in [1..#I] do S0[I[i]] := T0[i]; end for;
 return S0;
 end intrinsic;
 
@@ -163,15 +157,12 @@ if Labrande then
         else
             thetasmall := Theta(v, M0, tausmall);
             thetasqrt := Sqrt(thetas_sq[i]);
+            thetasqrts := [ thetasqrt, -thetasqrt ];
+            min, ind := Min([ Abs(thetasqrt - thetasmall) : thetasqrt in thetasqrts ]);
 
-            /* TODO: Ditch fixed precision */
-            if Abs(thetasqrt - thetasmall) le 10^(-10) then
-                Append(~thetas, thetasqrt);
-            elif Abs(thetasqrt + thetasmall) le 10^(-10) then
-                Append(~thetas, -thetasqrt);
-            else
-                error "No suitable root found";
-            end if;
+            assert min le 10^(-10);
+            thetasqrt := thetasqrts[ind];
+            Append(~thetas, thetasqrt);
         end if;
     end for;
     return thetas, thetas_sq;

@@ -6,9 +6,10 @@
  *  See LICENSE.txt for license details.
  */
 
+SetSeed(1);
 SetVerbose("EndoFind", 1);
 SetVerbose("Reconstruction", 1);
-SetVerbose("CurveRec", 1);
+SetVerbose("CurveRec", 2);
 
 prec := 300;
 F := RationalsExtra(prec);
@@ -46,7 +47,12 @@ print "Geometric reconstruction over base:";
 X := ReconstructCurveGeometric(tau, F : Base := true);
 print X;
 
+Q := PeriodMatrix(X);
+isos := SymplecticIsomorphismsCC(P, Q);
+
+/* Magma messes up big time here
 print "";
 print "Arithmetic reconstruction over base:";
 X := ReconstructCurve(P, F : Base := true);
 print X;
+*/

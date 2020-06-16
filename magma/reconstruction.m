@@ -161,7 +161,8 @@ X := HyperellipticCurve(f);
 
 R<x> := PolynomialRing(CC);
 fCC := (4*x^3 - g4CC*x - g6CC)/4; hCC := R ! 0;
-Q := ChangeRing(PeriodMatrix([ fCC, hCC ], [ f, h ]), CC);
+YCC := RiemannSurface(fCC, 2 : Precision := Precision(CC) + 10);
+Q := ChangeRing(YCC`BigPeriodMatrix, CC) / 2;
 
 /* The next line functions as an assertion */
 vprint CurveRec, 2 : "";
@@ -352,8 +353,8 @@ fCC := &*[ RCC.1 - rat : rat in rats ];
 /* Finding homomorphisms to original matrix */
 vprint CurveRec : "";
 vprint CurveRec : "Identifying correct twist...";
-Y := SE_Curve(fCC, 2 : Prec := Precision(CC));
-Q := ChangeRing(Y`BigPeriodMatrix, CC) / 2;
+YCC := RiemannSurface(fCC, 2 : Precision := Precision(CC) + 10);
+Q := ChangeRing(YCC`BigPeriodMatrix, CC) / 2;
 homs := GeometricHomomorphismRepresentationCC(P, Q);
 As := [ hom[1] : hom in homs ]; Rs := [ hom[2] : hom in homs ];
 if #As eq 0 then
@@ -410,8 +411,9 @@ vprint CurveRec : "done.";
 R := PolynomialRing(L);
 f := &+[ coeffs[i]*R.1^(i - 1) : i in [1..#coeffs] ];
 Y := HyperellipticCurve(f);
+YCC := RiemannSurface(fCC, 2 : Precision := Precision(CC) + 10);
+Q := ChangeRing(YCC`BigPeriodMatrix, CC) / 2;
 
-Q := ChangeRing(PeriodMatrix([ fCC ], [ f ]), CC);
 /* The next line functions as an assertion */
 vprint CurveRec, 2 : "";
 vprint CurveRec, 2 : "Check existence of homomorphism:";
@@ -595,7 +597,8 @@ vprint CurveRec, 2 : "done.";
 
 T := isos[1][1];
 gCC := EmbedPolynomialExtra(g);
-fCC := TransformForm(gCC, T);
+//fCC := TransformForm(gCC, T);
+fCC := TransformForm(gCC, T^(-1));
 CC := BaseRing(Parent(fCC));
 coeffs := [ c : c in Coefficients(fCC) | Abs(c) gt CC`epscomp ];
 min, ind := Minimum([ Abs(c) : c in coeffs ]);

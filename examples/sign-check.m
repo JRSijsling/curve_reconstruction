@@ -23,7 +23,7 @@ while true do
     if Abs(Discriminant(f)) gt 10^(-3) then
         shioda, W := ShiodaInvariants(f);
         shioda := WPSNormalizeCC(W, shioda : prec := 30);
-        X := SE_Curve(f, 2 : Prec := prec + 20);
+        X := RiemannSurface(f, 2 : Precision := prec + 20);
         P := ChangeRing(X`BigPeriodMatrix, CC);
 
         while true do

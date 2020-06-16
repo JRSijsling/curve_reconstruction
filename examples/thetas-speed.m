@@ -20,7 +20,7 @@ R<x> := PolynomialRing(CC);
 f := x^7 + x + 1;
 shioda, W := ShiodaInvariants(f);
 shioda := WPSNormalize(W, shioda);
-X := SE_Curve(f, 2 : Prec := prec + 20);
+X := RiemannSurface(f, 2 : Precision := prec + 20);
 P := ChangeRing(X`BigPeriodMatrix, CC);
 
 print "";
