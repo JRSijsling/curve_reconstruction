@@ -96,7 +96,7 @@ if Base then
     test, j := AlgebraizeElementExtra(jCC, K);
     if not test then
         vprint CurveRec : "";
-        vprint CurveRec : "Failed to algebraize";
+        vprint CurveRec : "Failed to algebraize j-invariant.";
         return 0, 0, false;
     end if;
     hKL := CanonicalInclusionMap(K, K);
@@ -147,7 +147,7 @@ if Base then
     testg6, g6 := AlgebraizeElementExtra(g6CC, K);
     if not (testg4 and testg6) then
         vprint CurveRec : "";
-        vprint CurveRec : "Failed to algebraize";
+        vprint CurveRec : "Failed to algebraize one of g4 and g6.";
         return 0, 0, false;
     end if;
     L := K; hKL := CanonicalInclusionMap(K, L);
@@ -166,7 +166,7 @@ Q := ChangeRing(YCC`BigPeriodMatrix, CC) / 2;
 
 /* The next line functions as an assertion */
 vprint CurveRec, 2 : "";
-vprint CurveRec, 2 : "Check existence of homomorphism:";
+vprint CurveRec, 2 : "Check for isomorphism...";
 A := Matrix(CC, [[1]]);
 R := HomologyRepresentation(A, P, Q);
 vprint CurveRec, 2 : "done.";
@@ -183,7 +183,7 @@ if Base then
     test, j := AlgebraizeElementExtra(jCC, K);
     if not test then
         vprint CurveRec : "";
-        vprint CurveRec : "Failed to algebraize";
+        vprint CurveRec : "Failed to algebraize j-invariant";
         return 0, 0, false;
     end if;
     hKL := CanonicalInclusionMap(K, K);
@@ -260,7 +260,7 @@ if Base then
     test, I := AlgebraizeElementsExtra(ICC, K);
     if not test then
         vprint CurveRec : "";
-        vprint CurveRec : "Failed to algebraize";
+        vprint CurveRec : "Failed to algebraize Igusa invariants.";
         return 0, 0, false;
     end if;
     L := K; hKL := CanonicalInclusionMap(K, L);
@@ -358,7 +358,8 @@ Q := ChangeRing(YCC`BigPeriodMatrix, CC) / 2;
 homs := GeometricHomomorphismRepresentationCC(P, Q);
 As := [ hom[1] : hom in homs ]; Rs := [ hom[2] : hom in homs ];
 if #As eq 0 then
-    error "No geometric homomorphism to original matrix found: increase precision or bound in calculating theta derivatives";
+    error "No geometric homomorphism to original matrix found.";
+    //: increase precision or bound in calculating theta derivatives";
 end if;
 
 /*  Identify correct twist */
@@ -384,7 +385,7 @@ else
     end for;
 
     if not found then
-        error "Failed to identify correct twist";
+        error "Failed to identify correct twist.";
     end if;
 end if;
 vprint CurveRec, 2 : "";
@@ -395,11 +396,11 @@ fCC := lam^2*fCC; coeffsCC := Coefficients(fCC);
 coeffsCC := ChangeUniverse(coeffsCC, K`CC);
 
 vprint CurveRec : "";
-vprint CurveRec : "Algebraizing elements...";
+vprint CurveRec : "Algebraizing...";
 if Base then
     test, coeffs := AlgebraizeElementsExtra(coeffsCC, K);
     if not test then
-        vprint CurveRec : "Failed to algebraize.";
+        vprint CurveRec : "Failed to algebraize coefficients.";
         return 0, 0, false;
     end if;
     L := K; hKL := CanonicalInclusionMap(K, L);
@@ -416,7 +417,7 @@ Q := ChangeRing(YCC`BigPeriodMatrix, CC) / 2;
 
 /* The next line functions as an assertion */
 vprint CurveRec, 2 : "";
-vprint CurveRec, 2 : "Check existence of homomorphism:";
+vprint CurveRec, 2 : "Check for isomorphism...";
 A := IdentityMatrix(CC, 2);
 R := HomologyRepresentation(A, P, Q);
 vprint CurveRec, 2 : "done.";
@@ -488,7 +489,7 @@ if Base then
     test, I := AlgebraizeElementsExtra(ICC, K);
     if not test then
         vprint CurveRec : "";
-        vprint CurveRec : "Failed to algebraize";
+        vprint CurveRec : "Failed to algebraize Igusa invariants.";
         return 0, 0, false;
     end if;
     L := K; hKL := CanonicalInclusionMap(K, L);
@@ -508,7 +509,7 @@ assert IsSmallPeriodMatrix(taunew);
 vprint CurveRec, 2 : "";
 vprint CurveRec, 2: "Calculating theta values...";
 thetas, thetas_sq := ThetaValues(taunew);
-vprint CurveRec, 2: "done";
+vprint CurveRec, 2: "done.";
 
 v0s := FindDelta(thetas_sq);
 vprint CurveRec, 2 : "";
@@ -522,7 +523,7 @@ if #v0s eq 0 then
         test, I := AlgebraizeElementsExtra(ICC, K);
         if not test then
             vprint CurveRec : "";
-            vprint CurveRec : "Failed to algebraize";
+            vprint CurveRec : "Failed to algebraize Dixmier--Ohno invariants.";
             return 0, 0, false;
         end if;
         L := K; hKL := CanonicalInclusionMap(K, L);
@@ -543,7 +544,7 @@ elif #v0s eq 1 then
         test, I := AlgebraizeElementsExtra(ICC, K);
         if not test then
             vprint CurveRec : "";
-            vprint CurveRec : "Failed to algebraize";
+            vprint CurveRec : "Failed to algebraize Shioda invariants.";
             return 0, 0, false;
         end if;
         L := K; hKL := CanonicalInclusionMap(K, L);
@@ -556,7 +557,7 @@ elif #v0s eq 1 then
 
 else
     vprint CurveRec : "";
-    vprint CurveRec : "Too many even theta characteristics vanish";
+    vprint CurveRec : "Too many even theta characteristics vanish.";
     return 0, 0, false;
 end if;
 
@@ -581,17 +582,17 @@ vprint CurveRec, 2 : Y;
 
 g := DefiningPolynomial(Y);
 vprint CurveRec, 2 : "";
-vprint CurveRec, 2 : "Determining period matrix of geometric reconstruction:";
+vprint CurveRec, 2 : "Determining period matrix of geometric reconstruction...";
 Q := PeriodMatrix(Y);
 if Type(Y) eq CrvHyp then
     vprint CurveRec : "";
-    vprint CurveRec : "Arithmetic reconstruction not yet possible for hyperelliptic curves";
+    vprint CurveRec : "Arithmetic reconstruction not yet possible for hyperelliptic curves.";
     return 0, 0, false;
 end if;
 vprint CurveRec, 2 : "done determining period matrix of geometric reconstruction.";
 
 vprint CurveRec, 2 : "";
-vprint CurveRec, 2 : "Determining isomorphisms with original period matrix:";
+vprint CurveRec, 2 : "Determining isomorphisms with original period matrix...";
 isos := SymplecticIsomorphismsCC(P, Q);
 vprint CurveRec, 2 : "done.";
 
@@ -611,7 +612,7 @@ if Base then
     test, coeffs := AlgebraizeElementsExtra(coeffsCC, K);
     if not test then
         vprint CurveRec : "";
-        vprint CurveRec : "Failed to algebraize";
+        vprint CurveRec : "Failed to algebraize coefficients.";
         return 0, 0, false;
     end if;
     L := K; hKL := CanonicalInclusionMap(K, L);
@@ -644,7 +645,7 @@ vprint CurveRec, 2: #v0s;
 
 if #v0s gt 1 then
     vprint CurveRec : "";
-    vprint CurveRec : "At least two vanishing even characteristics";
+    vprint CurveRec : "At least two vanishing even characteristics.";
     return 0, 0, false;
 end if;
 
@@ -658,7 +659,7 @@ if Base then
     test, I := AlgebraizeElementsExtra(ICC, K);
     if not test then
         vprint CurveRec : "";
-        vprint CurveRec : "Failed to algebraize";
+        vprint CurveRec : "Failed to algebraize invariants.";
         return 0, 0, false;
     end if;
     L := K; hKL := CanonicalInclusionMap(K, L);
