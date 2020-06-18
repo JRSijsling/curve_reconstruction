@@ -50,9 +50,7 @@ print X;
 Q := PeriodMatrix(X);
 isos := SymplecticIsomorphismsCC(P, Q);
 
-/* Magma messes up big time here
 print "";
 print "Arithmetic reconstruction over base:";
 X := ReconstructCurve(P, F : Base := true);
 print X;
-*/

@@ -597,8 +597,7 @@ vprint CurveRec, 2 : "done.";
 
 T := isos[1][1];
 gCC := EmbedPolynomialExtra(g);
-//fCC := TransformForm(gCC, T);
-fCC := TransformForm(gCC, T^(-1));
+fCC := TransformForm(gCC, T);
 CC := BaseRing(Parent(fCC));
 coeffs := [ c : c in Coefficients(fCC) | Abs(c) gt CC`epscomp ];
 min, ind := Minimum([ Abs(c) : c in coeffs ]);
