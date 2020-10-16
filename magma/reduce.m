@@ -62,7 +62,7 @@ end intrinsic;
 
 intrinsic LeftActionHg(M::AlgMatElt, tau::AlgMatElt) -> AlgMatElt
 {Left symplectic action corresponding to transpose of natural right action on (tau 1).}
-assert IsSmallPeriodMatrix(tau);
+//assert IsSmallPeriodMatrix(tau);
 g := #Rows(tau);
 A := Submatrix(M, 1,  1, g,g); B := Submatrix(M, 1,  g+1, g,g);
 C := Submatrix(M, g+1,1, g,g); D := Submatrix(M, g+1,g+1, g,g);
@@ -99,7 +99,7 @@ repeat
     T := U*T;
 until done;
 
-assert IsSmallPeriodMatrix(taured);
+//assert IsSmallPeriodMatrix(taured);
 TZZ := Matrix(Integers(), [ [ Round(c) : c in Eltseq(row) ] : row in Rows(T) ]);
 assert IsSymplecticMatrix(TZZ);
 return taured, T;
@@ -232,7 +232,7 @@ until done;
 
 assert Abs(taured[2,1] - taured[1,2]) lt CC`epscomp;
 taured[2,1] := taured[1,2];
-assert IsSmallPeriodMatrix(taured);
+//assert IsSmallPeriodMatrix(taured);
 TZZ := Matrix(Integers(), [ [ Round(c) : c in Eltseq(row) ] : row in Rows(T) ]);
 assert IsSymplecticMatrix(TZZ);
 return taured, T;
@@ -240,7 +240,7 @@ end function;
 
 
 function LLLReduceMatrixG3(tau);
-assert IsSmallPeriodMatrix(tau);
+//assert IsSmallPeriodMatrix(tau);
 tau[2,1] := tau[1,2]; tau[3,1] := tau[1,3]; tau[3,2] := tau[2,3];
 Imtau := Matrix([ [ Im(c) : c in Eltseq(row) ] : row in Rows(tau) ]);
 _, T := LLLGram(Imtau);
@@ -293,7 +293,7 @@ end function;
 
 intrinsic ReduceSmallPeriodMatrix(tau::.) -> .
 {Reduces a small period matrix after Labrande--Thomé.}
-assert IsSmallPeriodMatrix(tau);
+//assert IsSmallPeriodMatrix(tau);
 g := #Rows(tau);
 if g eq 1 then
     return ReduceSmallPeriodMatrixG1(tau);
