@@ -358,7 +358,7 @@ Q := ChangeRing(YCC`BigPeriodMatrix, CC) / 2;
 homs := GeometricHomomorphismRepresentationCC(P, Q);
 As := [ hom[1] : hom in homs ]; Rs := [ hom[2] : hom in homs ];
 if #As eq 0 then
-    error "No geometric homomorphism to original matrix found.";
+    error "No geometric homomorphism to original matrix found. Try increasing the precision.";
     //: increase precision or bound in calculating theta derivatives";
 end if;
 
@@ -385,7 +385,7 @@ else
     end for;
 
     if not found then
-        error "Failed to identify correct twist.";
+        error "Failed to identify correct twist. Try increasing the precision.";
     end if;
 end if;
 vprint CurveRec, 2 : "";
