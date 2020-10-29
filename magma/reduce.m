@@ -267,11 +267,13 @@ N0 := Matrix(Integers(), [
 counter := 0;
 while true do
     counter +:= 1;
+    /*
     if counter mod 10^3 eq 0 then
         vprint CurveRec : "";
         vprint CurveRec : "Counter for period matrix reduction is high:", counter;
         break;
     end if;
+    */
 
     vprint CurveRec, 2 : "";
     vprint CurveRec, 2 : "LLL reduction...";
