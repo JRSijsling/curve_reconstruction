@@ -44,11 +44,12 @@ return (x1*u1+x2*u2-x3*u3)^2-4*x1*u1*x2*u2;
 end function;
 
 
-function DixmierOhnoInvariantsFromThetas(thetas)
+intrinsic DixmierOhnoInvariantsFromThetas(thetas::.) -> .
+{Calculate Dixmier--Ohno invariants.}
 modsCC := ModuliFromTheta(thetas);
 ICC, W := DixmierOhnoInvariants(RiemannModelFromModuli(modsCC));
 return WPSNormalizeCC(W, ICC);
-end function;
+end intrinsic;
 
 
 intrinsic DixmierOhnoInvariants(X::Crv) -> .

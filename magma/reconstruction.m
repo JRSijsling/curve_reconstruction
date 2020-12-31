@@ -11,8 +11,7 @@
  * conventions of Birkenhake--Lange, but only locally */
 
 
-import "riemann.m": DixmierOhnoInvariantsFromThetas;
-import "rosenhain.m": FindDelta, ShiodaInvariantsFromThetaSquares;
+import "rosenhain.m": FindDelta;
 
 forward ReconstructCurveGeometricG1;
 forward ReconstructCurveGeometricG2;
