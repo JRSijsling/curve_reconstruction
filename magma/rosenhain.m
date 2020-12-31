@@ -248,7 +248,8 @@ end intrinsic;
 
 
 /* Final function */
-function RosenhainInvariantsFromThetaSquares(thetas_sq)
+intrinsic RosenhainInvariantsFromThetaSquares(thetas_sq::.) -> .
+{Computes Rosenhain invariants.}
 v0s := FindDelta(thetas_sq);
 if #v0s ne 1 then
     error "Not right number of even zero characteristics:", v0s;
@@ -257,15 +258,14 @@ v0 := v0s[1];
 gamma := PrecomputedGamma(v0); eta := EtaFunction(gamma);
 rosens := [ TakaseQuotient(thetas_sq, eta, 1, l, 2) : l in [3..7] ];
 return rosens, v0;
-end function;
+end intrinsic;
 
 
-function ShiodaInvariantsFromThetaSquares(thetas_sq)
-
+intrinsic ShiodaInvariantsFromThetaSquares(thetas_sq::.) -> .
+{Computes Shioda invariants.}
 rosens := RosenhainInvariantsFromThetaSquares(thetas_sq);
 CC := Parent(rosens[1]); R<x> := PolynomialRing(CC);
 f := x*(x - 1)* &*[ x - rosen : rosen in rosens ];
 SCC, W := ShiodaInvariants(f);
 return WPSNormalizeCC(W, SCC);
-
-end function;
+end intrinsic;
