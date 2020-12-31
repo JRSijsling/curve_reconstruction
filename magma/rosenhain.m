@@ -169,7 +169,9 @@ if Labrande then
 end if;
 g := #Rows(tau);
 M0 := ZeroMatrix(Rationals(), g, 1);
-return [ Theta(VectorFromIndex(g, i), M0, tau) : i in [1..2^(2*g)] ];
+thetas := [ Theta(VectorFromIndex(g, i), M0, tau) : i in [1..2^(2*g)] ];
+thetas_sq := [ theta^2 : theta in thetas ];
+return thetas, thetas_sq;
 end intrinsic;
 
 
