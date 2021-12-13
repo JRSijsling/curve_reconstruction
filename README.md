@@ -6,7 +6,7 @@ This repository contains Magma code for reconstructing hyperelliptic curves of g
 Prerequisites
 --
 
-An installation of Magma and the dependencies [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms), [`JRSijsling/quartic_reconstruction`](https://github.com/JRSijsling/quartic_reconstruction), and [`JRSijsling/quartic_isomorphisms`](https://github.com/JRSijsling/quartic_isomorphisms).
+An installation of Magma and the dependencies [`edgarcosta/endomorphisms`](https://github.com/edgarcosta/endomorphisms) and [`JRSijsling/quartic`](https://github.com/JRSijsling/quartic).
 
 Installation
 --
