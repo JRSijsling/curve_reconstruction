@@ -8,6 +8,7 @@
 
 SetSeed(1);
 SetVerbose("EndoFind", 1);
+SetVerbose("QuarticRec", 1);
 SetVerbose("CurveRec", 2);
 
 prec := 300;
