@@ -8,7 +8,6 @@
 
 SetSeed(1);
 SetVerbose("EndoFind", 1);
-SetVerbose("Reconstruction", 1);
 SetVerbose("CurveRec", 2);
 
 prec := 300;
