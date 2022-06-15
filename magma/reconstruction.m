@@ -364,7 +364,7 @@ end if;
 /*  Identify correct twist */
 M := Matrix([ [ Re(A[1,1] - A[2,2]), Im(A[1,1] - A[2,2]), Re(A[1,2]), Im(A[1,2]), Re(A[2,1]), Im(A[2,1]) ] : A in As ]);
 Ker := IntegralLeftKernel(M); rows := Rows(Ker);
-if not IsZero(Ker) then
+if IsZero(Ker) then
     error "Failed to identify correct twist. Try increasing the precision.";
 end if;
 
