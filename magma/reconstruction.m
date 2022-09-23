@@ -586,7 +586,7 @@ vprint CurveRec, 2 : Y;
 g := DefiningPolynomial(Y);
 vprint CurveRec, 2 : "";
 vprint CurveRec, 2 : "Determining period matrix of geometric reconstruction...";
-Q := PeriodMatrix(Y);
+Q := ChangeRing(PeriodMatrix(Y), CC);
 if Type(Y) eq CrvHyp then
     vprint CurveRec : "";
     vprint CurveRec : "Arithmetic reconstruction not yet possible for hyperelliptic curves.";
