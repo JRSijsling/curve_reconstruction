@@ -155,12 +155,12 @@ else
     g4 := elts[1]; g6 := elts[2];
 end if;
 
-R<x> := PolynomialRing(L); f := (4*x^3 - g4*x - g6)/4; h := 0;
+R<x> := PolynomialRing(L);
+f := (4*x^3 - g4*x - g6)/4; h := 0;
 X := HyperellipticCurve(f);
 
-R<x> := PolynomialRing(CC);
-fCC := (4*x^3 - g4CC*x - g6CC)/4; hCC := R ! 0;
-YCC := RiemannSurface(fCC, 2 : Precision := Precision(CC) + 10);
+fCC := EmbedPolynomialExtra(f);
+YCC := RiemannSurface(fCC, 2 : Precision := Precision(CC));
 Q := ChangeRing(YCC`BigPeriodMatrix, CC) / 2;
 
 /* The next line functions as an assertion */
